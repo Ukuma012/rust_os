@@ -1,0 +1,10 @@
+target/
+**/*.rs.bk
+.vscode/
+build/
+
+bootloader.efi
+
+mnt/
+app.img
+kernel.elf
