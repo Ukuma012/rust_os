@@ -3,6 +3,8 @@ target/
 .vscode/
 build/
 
+Cargo.lock
+
 bootloader.efi
 
 mnt/
