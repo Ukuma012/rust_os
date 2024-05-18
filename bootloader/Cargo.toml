@@ -8,3 +8,4 @@ goblin = {version = "0.8.2", features = ["elf64", "elf32", "endian_fd"], default
 log = {version = "0.4.21", default-features = false}
 uefi = {version = "0.16.0", features = ["exts"]}
 uefi-services = "0.13.0"
+common = {path = "../common"}

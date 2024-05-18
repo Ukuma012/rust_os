@@ -1,43 +1,9 @@
 #![no_std]
 #![no_main]
 
-use core::{panic::PanicInfo, arch::asm, slice};
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
-pub enum BootPixelFormat {
-    Rgb,
-    Bgr,
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct FrameBuffer {
-    pub frame_buffer: *mut u8,
-    pub stride: u32,
-    pub resolution: (u32, u32), // (horizontal, vertical)
-    pub format: BootPixelFormat,
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct MemoryMap {
-    pub descriptors: *const Descriptor,
-    pub descriptors_len: u64,
-}
-
-impl MemoryMap {
-    pub fn descriptors(&self) -> &[Descriptor] {
-        unsafe { slice::from_raw_parts(self.descriptors, self.descriptors_len as usize)}
-    }
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct Descriptor {
-    pub phys_start: u64,
-    pub phys_end: u64,
-}
+use core::{panic::PanicInfo, arch::asm};
+use common::frame_buffer::FrameBuffer;
+use common::memory_map::MemoryMap;
 
 struct PixelColor {
     r: u8,
@@ -45,7 +11,7 @@ struct PixelColor {
     b: u8,
 }
 
-const kFontA: [u8; 16] = [
+const K_FONT_A: [u8; 16] = [
     0b00000000,
     0b00011000,
     0b00011000,
@@ -113,7 +79,7 @@ fn write_ascii(config: &FrameBuffer, x: u32, y: u32, c: char, color: &PixelColor
 
     for dy in 0..16 {
         for dx in 0..8 {
-            if (kFontA[dy] << dx) & 0x80u8 != 0 {
+            if (K_FONT_A[dy] << dx) & 0x80u8 != 0 {
                 write_pixel(config, x+dx, y+dy as u32, color);
             }
         }

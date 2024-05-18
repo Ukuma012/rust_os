@@ -7,50 +7,30 @@ extern crate alloc;
 use core::{slice, mem, arch::asm};
 use alloc::vec;
 use alloc::vec::Vec;
-use uefi::{prelude::*, proto::{console::gop::{GraphicsOutput, PixelFormat}, loaded_image::LoadedImage, media::{file::{Directory, FileAttribute, FileInfo, FileMode, RegularFile}, fs::SimpleFileSystem}}, table::{boot::{self, MemoryType}, cfg::ACPI_GUID}, CStr16};
-use uefi::proto::media::file::File;
+use uefi::{
+    prelude::*,
+    proto::{
+        console::gop::{GraphicsOutput, PixelFormat},
+        loaded_image::LoadedImage,
+        media::{
+            file::{Directory, File, FileAttribute, FileInfo, FileMode, RegularFile},
+            fs::SimpleFileSystem,
+        },
+    },
+    table::{
+        boot::{self, MemoryType},
+        cfg::ACPI_GUID,
+    },
+    CStr16,
+};
 use uefi::table::Runtime;
 use log::{trace, info};
 use goblin::elf::{Elf, program_header};
 use uefi::table::boot::MemoryDescriptor;
+use common::frame_buffer;
+use common::memory_map;
 
 const UEFI_PAGE_SIZE: usize = 0x1000;
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
-pub enum BootPixelFormat {
-    Rgb,
-    Bgr,
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct FrameBuffer {
-    pub frame_buffer: *mut u8,
-    pub stride: u32,
-    pub resolution: (u32, u32), // (horizontal, vertical)
-    pub format: BootPixelFormat,
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct MemoryMap {
-    pub descriptors: *const Descriptor,
-    pub descriptors_len: u64,
-}
-
-impl MemoryMap {
-    pub fn descriptors(&self) -> &[Descriptor] {
-        unsafe { slice::from_raw_parts(self.descriptors, self.descriptors_len as usize)}
-    }
-}
-
-#[repr(C)]
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
-pub struct Descriptor {
-    pub phys_start: u64,
-    pub phys_end: u64,
-}
 
 #[entry]
 fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
@@ -66,7 +46,7 @@ fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
     let elf_entry = load_kernel(handle, bs);
 
     trace!("entry_point_addr = 0x{:x}", elf_entry);
-    let entry_point: extern "sysv64" fn(&FrameBuffer, &MemoryMap) = unsafe {
+    let entry_point: extern "sysv64" fn(&frame_buffer::FrameBuffer, &memory_map::MemoryMap) = unsafe {
         mem::transmute(elf_entry)
     };
 
@@ -161,10 +141,10 @@ fn load_kernel(_image: Handle, boot_services: &BootServices) -> usize {
     load_elf(&boot_services, buf)
 }
 
-fn get_frame_buffer(boot_services: &BootServices) -> FrameBuffer {
+fn get_frame_buffer(boot_services: &BootServices) -> frame_buffer::FrameBuffer {
     let gop = boot_services.locate_protocol::<GraphicsOutput>().unwrap();
     let gop = unsafe {&mut *gop.get()};
-    FrameBuffer {
+    frame_buffer::FrameBuffer {
         frame_buffer: gop.frame_buffer().as_mut_ptr(),
         stride: gop.current_mode_info().stride() as u32,
         resolution: (
@@ -172,8 +152,8 @@ fn get_frame_buffer(boot_services: &BootServices) -> FrameBuffer {
             gop.current_mode_info().resolution().1 as u32,
         ),
         format: match gop.current_mode_info().pixel_format() {
-            PixelFormat::Rgb => BootPixelFormat::Rgb,
-            PixelFormat::Bgr => BootPixelFormat::Bgr,
+            PixelFormat::Rgb => frame_buffer::PixelFormat::Rgb,
+            PixelFormat::Bgr => frame_buffer::PixelFormat::Bgr,
             f => panic!("Unsupported pixel format: {:?}", f),
         },
     }
@@ -182,7 +162,7 @@ fn get_frame_buffer(boot_services: &BootServices) -> FrameBuffer {
 fn exit_boot_services(
     image: Handle,
     st: SystemTable<Boot>,
-) -> (SystemTable<Runtime>, MemoryMap) {
+) -> (SystemTable<Runtime>, memory_map::MemoryMap) {
     let enough_mmap_size =
         st.boot_services().memory_map_size().map_size + 8 * mem::size_of::<MemoryDescriptor>();
     let mmap_buf = vec![0; enough_mmap_size].leak();
@@ -194,7 +174,7 @@ fn exit_boot_services(
     // uefi::MemoryDescriptor -> memory_map::Descriptor
     for d in raw_descriptors {
         if is_available_after_exit_boot_services(d.ty) {
-            descriptors.push(Descriptor {
+            descriptors.push(memory_map::Descriptor {
                 phys_start: d.phys_start,
                 phys_end: d.phys_start + d.page_count * UEFI_PAGE_SIZE as u64,
             });
@@ -202,8 +182,8 @@ fn exit_boot_services(
     }
     let memory_map = {
         let (ptr, len, _) = descriptors.into_raw_parts();
-        MemoryMap {
-            descriptors: ptr as *const Descriptor,
+        memory_map::MemoryMap {
+            descriptors: ptr as *const memory_map::Descriptor,
             descriptors_len: len as u64,
         }
     };
