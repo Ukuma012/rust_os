@@ -2,6 +2,7 @@ target/
 **/*.rs.bk
 .vscode/
 build/
+*.bin
 
 Cargo.lock
 

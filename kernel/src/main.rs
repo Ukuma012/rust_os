@@ -43,9 +43,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
         }
     }
 
-    write_ascii(frame_buffer, 100, 50, 'A', &black);
-    write_ascii(frame_buffer, 108, 50, 'A', &black);
-
+    for(i, c) in ('!'..='~').enumerate() {
+        write_ascii(frame_buffer, (8 * i) as u32, 50, c, &black);
+    }
 
     loop {
         unsafe {asm!("hlt")}
