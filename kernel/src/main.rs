@@ -33,9 +33,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     }
 
     let mut console = Console::new(green, black, *frame_buffer);
-    console.put_string("Hello\n");
-    console.put_string("Hello\n");
-    console.put_string("Hello World\n");
+    for _i in 0..100 {
+        console.put_string("Hello World\n");
+    }
 
     loop {
         unsafe {asm!("hlt")}
