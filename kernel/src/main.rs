@@ -35,21 +35,11 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
 
     for x in 0..frame_buffer.resolution.0 {
         for y in 0..frame_buffer.resolution.1 {
-            write_pixel(frame_buffer, x, y, &white);
+            write_pixel(frame_buffer, x, y, &black);
         }
     }
 
-    for x in 0..200 {
-        for y in 0..100 {
-            write_pixel(frame_buffer, 100+x, 100+y, &green);
-        }
-    }
-
-    for(i, c) in ('!'..='~').enumerate() {
-        write_ascii(frame_buffer, (8 * i) as u32, 50, c, &black);
-    }
-
-    let mut console = Console::new(black, green, *frame_buffer);
+    let mut console = Console::new(green, black, *frame_buffer);
     console.put_string("Hello World");
 
     loop {
