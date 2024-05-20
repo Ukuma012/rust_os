@@ -3,10 +3,12 @@
 
 pub mod graphics;
 pub mod font;
+pub mod console;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBuffer;
 use common::memory_map::MemoryMap;
+use console::Console;
 use crate::graphics::{PixelColor, write_pixel};
 use crate::font::write_ascii;
 
@@ -46,6 +48,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     for(i, c) in ('!'..='~').enumerate() {
         write_ascii(frame_buffer, (8 * i) as u32, 50, c, &black);
     }
+
+    let mut console = Console::new(black, green, *frame_buffer);
+    console.put_string("Hello World");
 
     loop {
         unsafe {asm!("hlt")}
