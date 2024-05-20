@@ -10,16 +10,9 @@ use common::frame_buffer::FrameBuffer;
 use common::memory_map::MemoryMap;
 use console::Console;
 use crate::graphics::{PixelColor, write_pixel};
-use crate::font::write_ascii;
 
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &MemoryMap) {
-
-    let white = PixelColor {
-        r: 255,
-        g: 255,
-        b: 255,
-    };
 
     let green = PixelColor {
         r: 51,
@@ -40,7 +33,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     }
 
     let mut console = Console::new(green, black, *frame_buffer);
-    console.put_string("Hello World");
+    console.put_string("Hello\n");
+    console.put_string("Hello\n");
+    console.put_string("Hello World\n");
 
     loop {
         unsafe {asm!("hlt")}

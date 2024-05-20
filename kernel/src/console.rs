@@ -31,6 +31,7 @@ impl Console {
         for char in str.chars() {
             if char == '\n' {
                 self.new_line();
+                continue;
             } else if self.cursor_column < COLUMNS - 1 {
                write_ascii(&self.frame_buffer, 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color) 
             }
@@ -40,6 +41,10 @@ impl Console {
     }
 
     fn new_line(&mut self) {
-        todo!()
+        self.cursor_column = 0;
+        if self.cursor_row < ROWS - 1 {
+            self.cursor_row += 1;
+            return;
+        }
     }
 }
