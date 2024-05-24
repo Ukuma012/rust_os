@@ -6,24 +6,24 @@ use crate::font::write_ascii;
 const ROWS: usize = 25;
 const COLUMNS: usize = 80;
 
-pub struct Console {
-    frame_buffer: FrameBuffer,
-    fg_color: PixelColor,
-    bg_color: PixelColor,
+pub struct Console <'a>{
+    frame_buffer: &'a FrameBuffer,
+    fg_color: &'a PixelColor,
+    bg_color: &'a PixelColor,
     cursor_row: usize,
     cursor_column: usize,
     buffer: [[char; COLUMNS + 1]; ROWS],
 }
 
-impl Console {
-    pub fn new(fg_color: PixelColor, bg_color: PixelColor, frame_buffer: FrameBuffer) -> Console {
+impl<'a> Console<'a> {
+    pub fn new(fg_color: &'a PixelColor, bg_color: &'a PixelColor, frame_buffer: &'a FrameBuffer) -> Console<'a> {
         Self {
             frame_buffer,
             fg_color,
             bg_color,
             cursor_row: 0,
             cursor_column: 0,
-            buffer: [[char::from(0); COLUMNS + 1]; ROWS],
+            buffer: [['\0'; COLUMNS + 1]; ROWS],
         }
     }
 
