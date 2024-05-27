@@ -1,9 +1,20 @@
+use core::ops::AddAssign;
 use common::frame_buffer::FrameBuffer;
 
 pub struct Vector2D<T> {
     pub x: T,
     pub y: T
 }
+
+impl<T> AddAssign for Vector2D<T>
+where
+    T: AddAssign
+    {
+        fn add_assign(&mut self, other: Vector2D<T>) {
+            self.x.add_assign(other.x);
+            self.y.add_assign(other.y);
+        }
+    }
 
 pub struct PixelColor {
     pub r: u8,

@@ -82,7 +82,13 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
         }
     }
 
-    fill_rectangle(frame_buffer, Vector2D {x: 100, y: 100}, Vector2D {x: 300, y: 600}, &white);
+    let mut vector1 = Vector2D { x: 100, y: 100 };
+    let vector2 = Vector2D { x: 200, y: 2000 };
+    let vector3 = Vector2D { x: 100, y: 100 };
+
+    vector1 += vector2;
+
+    fill_rectangle(frame_buffer, vector3, vector1, &white);
 
     loop {
         unsafe {asm!("hlt")}
