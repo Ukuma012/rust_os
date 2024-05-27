@@ -1,5 +1,10 @@
 use common::frame_buffer::FrameBuffer;
 
+pub struct Vector2D<T> {
+    pub x: T,
+    pub y: T
+}
+
 pub struct PixelColor {
     pub r: u8,
     pub g: u8,
@@ -18,3 +23,10 @@ pub fn write_pixel(config: &FrameBuffer, x: u32, y: u32, c: &PixelColor) {
     }
 }
 
+pub fn fill_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
+    for y in 0..size.y {
+        for x in 0..size.x {
+            write_pixel(frame_buffer, pos.x + x, pos.y + y, color);
+        }
+    }
+}

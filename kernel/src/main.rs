@@ -9,6 +9,7 @@ use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBuffer;
 use common::memory_map::MemoryMap;
 use console::Console;
+use graphics::{fill_rectangle, Vector2D};
 use crate::graphics::{PixelColor, write_pixel};
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
@@ -80,6 +81,8 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
             }
         }
     }
+
+    fill_rectangle(frame_buffer, Vector2D {x: 100, y: 100}, Vector2D {x: 300, y: 600}, &white);
 
     loop {
         unsafe {asm!("hlt")}
