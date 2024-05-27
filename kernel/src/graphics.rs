@@ -41,3 +41,15 @@ pub fn fill_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vect
         }
     }
 }
+
+pub fn draw_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
+    for x in 0..size.x {
+        write_pixel(frame_buffer, pos.x + x, pos.y, color);
+        write_pixel(frame_buffer, pos.x + x, pos.y + size.y, color);
+    }
+
+    for y in 1..size.y-1 {
+        write_pixel(frame_buffer, pos.x, pos.y + y, color);
+        write_pixel(frame_buffer, pos.x + size.x - 1, pos.y + y, color);
+    }
+}
