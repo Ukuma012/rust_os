@@ -28,9 +28,9 @@ pub fn write_pixel(config: &FrameBuffer, x: u32, y: u32, c: &PixelColor) {
 
     unsafe {
         let p = config.frame_buffer.offset(base);
-            *p.offset(0) = c.r;
+            *p.offset(0) = c.b;
             *p.offset(1) = c.g;
-            *p.offset(2) = c.b;
+            *p.offset(2) = c.r;
     }
 }
 
