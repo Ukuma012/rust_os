@@ -3,6 +3,7 @@ target/
 .vscode/
 build/
 *.bin
+memo/
 
 Cargo.lock
 
