@@ -6,3 +6,5 @@ edition = "2021"
 [dependencies]
 log = {version = "0.4.21", default-features = false}
 common = {path = "../common"}
+lazy_static = {version = "1.4.0", features = ["spin_no_std"]}
+spin = "0.9.8"
