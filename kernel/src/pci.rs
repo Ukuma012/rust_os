@@ -1,11 +1,17 @@
 #[no_std]
 #[no_main]
+use crate::error::{Code, Error};
+use crate::make_error;
 use lazy_static::lazy_static;
-use spin::Mutex;
+use spin::mutex::Mutex;
 
 const CONFIG_ADDRESS: u16 = 0x0cf8;
 const CONFIG_DATA: u16 = 0x0cfc;
+const NON_EXISTENT_DEVICE: u16 = 0xffff;
 
+lazy_static! {
+   static ref NUM_DEVICE: Mutex<usize> = Mutex::new(0); 
+}
 
 #[derive(Copy, Clone, Debug)]
 pub struct Device {
@@ -42,6 +48,14 @@ impl ClassCode {
             sub,
             interface,
         }
+    }
+
+    fn is_match_base(&self, base: u8) -> bool {
+        base == self.base
+    }
+
+    fn is_match_base_sub(&self, base: u8, sub: u8) -> bool {
+        self.is_match_base(base) && sub == self.sub
     }
 }
 
@@ -127,4 +141,83 @@ fn write_conf_reg(device: &Device, reg_addr: u8, value: u32) {
     let address = make_address(device.bus, device.device, device.function, reg_addr);
     write_address(address);
     write_data(value);
+}
+
+pub fn scan_all_bus() -> Result<(), Error> {
+    let header_type = read_header_type(0, 0, 0);
+    if is_single_function_device(header_type) {
+        return scan_bus(0);
+    }
+
+    for function in 1..8 as u8 {
+        if read_vendor_id(0, 0, function) == NON_EXISTENT_DEVICE {
+            continue;
+        }
+
+        let bus = function;
+        scan_bus(bus)?;
+    }
+
+    Ok(())
+}
+
+fn scan_bus(bus: u8) -> Result<(), Error> {
+    for device in 0..32 as u8 {
+        if read_vendor_id(bus, device, 0) == NON_EXISTENT_DEVICE {
+            continue;
+        }
+        scan_device(bus, device)?;
+    }
+
+    Ok(())
+}
+
+fn scan_device(bus: u8, device: u8) -> Result<(), Error> {
+    scan_function(bus, device, 0)?;
+
+    if is_single_function_device(read_header_type(bus, device, 0)) {
+        return Ok(());
+    }
+
+    for function in 1..8 as u8 {
+        if read_vendor_id(bus, device, function) == NON_EXISTENT_DEVICE {
+            continue;
+        }
+        scan_function(bus, device, function)?;
+    }
+
+    Ok(())
+}
+
+fn scan_function(bus: u8, device: u8, function: u8) -> Result<(), Error> {
+    let class_code = read_class_code(bus, device, function);
+    let header_type = read_header_type(bus, device, function);
+    add_device(bus, device, function, header_type, class_code)?;
+
+    // if the device is a PCI to PCI bridge
+    if class_code.is_match_base_sub(0x06, 0x04) {
+        // scan pci devices whtich are connected with the secondary_bus
+        let bus_numbers = read_bus_number(bus, device, function);
+        let secondary_bus = (bus_numbers >> 8) & 0xff;
+        return scan_bus(secondary_bus as u8);
+    }
+
+    Ok(())
+}
+
+fn add_device(bus: u8, device: u8, function: u8, header_type: u8, class_code: ClassCode) -> Result<(), Error> {
+    let mut num_device = NUM_DEVICE.lock();
+    if *num_device == DEVICES.lock().len() {
+        return Err(make_error!(Code::Full))
+    }
+
+    let mut devices = DEVICES.lock();
+    devices[*num_device] = Device::new(bus, device, function, header_type, class_code);
+    *num_device += 1;
+
+    Ok(())
+}
+
+fn is_single_function_device(header_type: u8) -> bool {
+    header_type & 0x80 == 0
 }

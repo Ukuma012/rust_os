@@ -5,6 +5,7 @@ pub mod graphics;
 pub mod font;
 pub mod console;
 mod pci;
+mod error;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBuffer;

@@ -58,8 +58,6 @@ impl<'a> Console<'a> {
             for col in 0..COLUMNS {
                 write_ascii(&self.frame_buffer, 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color);
             }
-
         }
     }
-
 }
