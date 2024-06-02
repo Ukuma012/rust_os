@@ -61,7 +61,7 @@ fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
 
     entry_point(&frame_buffer, &memory_map);
 
-    trace!("you should not see this message");
+    trace!("you cannot see this message");
 
 
     loop {
