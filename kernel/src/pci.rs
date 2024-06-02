@@ -1,5 +1,3 @@
-#[no_std]
-#[no_main]
 use crate::error::{Code, Error};
 use crate::make_error;
 use lazy_static::lazy_static;
