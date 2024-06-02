@@ -12,6 +12,7 @@ use common::frame_buffer::FrameBuffer;
 use common::memory_map::MemoryMap;
 use console::Console;
 use graphics::{draw_rectangle, fill_rectangle, Vector2D};
+use pci::scan_all_bus;
 use crate::graphics::{PixelColor, write_pixel};
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
@@ -84,6 +85,12 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
                 write_pixel(frame_buffer, 200+x as u32, 100+y as u32, &black);
             }
         }
+    }
+
+    let _all_buses = scan_all_bus().unwrap();
+    let num_devices = pci::NUM_DEVICE.lock();
+    for _i in 0..*num_devices {
+        console.put_string("Hi I'm a pci device\n");
     }
 
     loop {

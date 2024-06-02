@@ -8,7 +8,7 @@ const CONFIG_DATA: u16 = 0x0cfc;
 const NON_EXISTENT_DEVICE: u16 = 0xffff;
 
 lazy_static! {
-   static ref NUM_DEVICE: Mutex<usize> = Mutex::new(0); 
+   pub static ref NUM_DEVICE: Mutex<usize> = Mutex::new(0); 
 }
 
 #[derive(Copy, Clone, Debug)]

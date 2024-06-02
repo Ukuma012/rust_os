@@ -1,16 +1,22 @@
 use std::env;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let current_dir = env::current_dir().unwrap();
 
+    build_hankaku(&out_dir, &current_dir);
+    build_asm(&out_dir, &current_dir);
+}
+
+fn build_hankaku(out_dir: &str, current_dir: &PathBuf) {
     let make_font = Path::new(&current_dir)
         .parent()
         .unwrap()
         .join("tools")
         .join("makefont.py");
+
     Command::new(make_font)
         .arg("-o")
         .arg(format!("{}/hankaku.bin", out_dir))
@@ -38,4 +44,25 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", out_dir);
     println!("cargo:rustc-link-lib=static=hankaku");
     println!("cargo:rerun-if-changed=hankaku.tx");
+}
+
+fn build_asm(out_dir: &str, current_dir: &PathBuf) {
+
+    Command::new("nasm")
+        .current_dir(current_dir)
+        .args(&["-f", "elf64"])
+        .arg("-o")
+        .arg(Path::new(out_dir).join("asmfunc.o"))
+        .arg("asmfunc.asm")
+        .status()
+        .unwrap();
+
+    Command::new("ar")
+        .args(&["crs", "libasmfunc.a", "asmfunc.o"])
+        .current_dir(out_dir)
+        .status()
+        .unwrap();
+
+    println!("cargo:rustc-link-lib=static=asmfunc");
+    println!("cargo:rerun-if-changed=asmfunc.asm");
 }
