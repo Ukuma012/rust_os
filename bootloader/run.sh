@@ -7,4 +7,9 @@ sudo cp ../target/x86_64-unknown-uefi/release/bootloader.efi ./mnt/EFI/BOOT/BOOT
 sudo cp ../kernel.elf ./mnt/kernel.elf
 sleep 1
 sudo umount ./mnt
-cd .. && qemu-system-x86_64 -bios OVMF_CODE.fd -device ahci,id=ahci -device ide-cd,drive=disk,bus=ahci.0 -drive id=disk,if=none,format=raw,file=bootloader/build/app.img
+cd .. && qemu-system-x86_64 \
+         -bios OVMF_CODE.fd \
+         -device ahci,id=ahci \
+         -device ide-cd,drive=disk,bus=ahci.0 \
+         -drive id=disk,if=none,format=raw,file=bootloader/build/app.img \
+         -device qemu-xhci

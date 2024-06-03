@@ -17,7 +17,7 @@ pub struct Device {
     device: u8,
     function: u8,
     header_type: u8,
-    class_code: ClassCode,
+    pub class_code: ClassCode,
 }
 
 impl Device {
@@ -33,7 +33,7 @@ impl Device {
 }
 
 #[derive(Copy, Clone, Debug)]
-struct ClassCode {
+pub struct ClassCode {
     base: u8,
     sub: u8,
     interface: u8,
@@ -55,6 +55,10 @@ impl ClassCode {
     fn is_match_base_sub(&self, base: u8, sub: u8) -> bool {
         self.is_match_base(base) && sub == self.sub
     }
+
+    pub fn is_match_all(&self, base: u8, sub: u8, interface: u8) -> bool {
+        self.is_match_base_sub(base, sub) && interface == self.interface
+    }
 }
 
 impl From<u32> for ClassCode {
@@ -67,7 +71,7 @@ impl From<u32> for ClassCode {
 }
 
 lazy_static! {
-    static ref DEVICES: Mutex<[Device; 32]> = Mutex::new([Device {
+    pub static ref DEVICES: Mutex<[Device; 32]> = Mutex::new([Device {
         bus: 0,
         device: 0,
         function: 0,

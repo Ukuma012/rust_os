@@ -89,9 +89,13 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
 
     let _all_buses = scan_all_bus().unwrap();
     let num_devices = pci::NUM_DEVICE.lock();
-    for _i in 0..*num_devices {
-        console.put_string("Hi I'm a pci device\n");
-    }
+    let devices = pci::DEVICES.lock();
+    for i in 0..*num_devices {
+            if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
+                console.put_string("hi\n");
+            }
+     }
+    
 
     loop {
         unsafe {asm!("hlt")}
