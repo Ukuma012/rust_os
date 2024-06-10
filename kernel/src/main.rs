@@ -90,12 +90,27 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     let _all_buses = scan_all_bus().unwrap();
     let num_devices = pci::NUM_DEVICE.lock();
     let devices = pci::DEVICES.lock();
+    let mut xhc_dev: Option<pci::Device> = None;
     for i in 0..*num_devices {
             if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
-                console.put_string("hi\n");
+                xhc_dev = Some(devices[i]);
+
+                // Prioritize Intel Products
+                if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
+                    break;
+                }
             }
      }
-    
+
+     if let Some(dev) = xhc_dev {
+        let xhc_bar = pci::read_bar(&dev, 0).unwrap();
+        let xhc_mmio_base = xhc_bar & !(0x0f as u64);
+        
+        // let controller = XhciController::new(xhc_mmio_base);
+        
+     } else {
+        console.put_string("xHCI Device not found\n");
+     }
 
     loop {
         unsafe {asm!("hlt")}

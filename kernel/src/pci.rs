@@ -30,6 +30,10 @@ impl Device {
             class_code,
         }
     }
+
+    pub fn vender_id(&self) -> u16 {
+        read_vendor_id(self.bus, self.device, self.function)
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -222,4 +226,30 @@ fn add_device(bus: u8, device: u8, function: u8, header_type: u8, class_code: Cl
 
 fn is_single_function_device(header_type: u8) -> bool {
     header_type & 0x80 == 0
+}
+
+pub fn read_bar(device: &Device, bar_index: usize) -> Result<u64, Error> {
+    if bar_index >= 6 {
+        return Err(make_error!(Code::IndexOutOfRange));
+    }
+
+    let addr = calc_bar_address(bar_index);
+    let bar = read_conf_reg(device, addr) as u64;
+
+    // 32 bit address
+    if bar & 4 == 0 {
+        return Ok(bar);
+    }
+
+    // 64 bit address
+    if bar_index >= 5 {
+        return Err(make_error!(Code::IndexOutOfRange));
+    }
+
+    let bar_upper = read_conf_reg(device, addr + 4) as u64;
+    return Ok(bar | bar_upper << 32);
+}
+
+fn calc_bar_address(bar_index: usize) -> u8 {
+    (0x10 + 4 * bar_index) as u8
 }
