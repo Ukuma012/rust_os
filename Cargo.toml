@@ -2,5 +2,8 @@
 members = [
     "common",
     "bootloader",
-    "kernel",
+    "kernel"
 ]
+
+[workspace.dependencies]
+xhci = "0.9.1"

@@ -6,6 +6,7 @@ pub mod font;
 pub mod console;
 mod pci;
 mod error;
+mod usb;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBuffer;
@@ -14,6 +15,7 @@ use console::Console;
 use graphics::{draw_rectangle, fill_rectangle, Vector2D};
 use pci::scan_all_bus;
 use crate::graphics::{PixelColor, write_pixel};
+use usb::xhci::mapper::IdentityMapper;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -105,8 +107,8 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
      if let Some(dev) = xhc_dev {
         let xhc_bar = pci::read_bar(&dev, 0).unwrap();
         let xhc_mmio_base = xhc_bar & !(0x0f as u64);
-        
-        // let controller = XhciController::new(xhc_mmio_base);
+
+        let registers = unsafe { xhci::registers::Registers::new(xhc_mmio_base.try_into().unwrap(), IdentityMapper) };
         
      } else {
         console.put_string("xHCI Device not found\n");
