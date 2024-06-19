@@ -1,8 +1,12 @@
 use super::xhciregisters::XhciRegisters;
 use super::mapper::IdentityMapper;
+// use super::ringbuffer::{ComamndRing, EventRing, TransferRing};
 
 pub struct XhciController {
-    pub registers: XhciRegisters<IdentityMapper>
+    pub registers: XhciRegisters<IdentityMapper>,
+    // command_ring: ComamndRing,
+    // event_ring: EventRing,
+    // transfer_ring: TransferRing,
 }
 
 impl XhciController {
