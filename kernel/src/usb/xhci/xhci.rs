@@ -6,9 +6,13 @@ pub struct XhciController {
 }
 
 impl XhciController {
-    pub fn new(registers: XhciRegisters<IdentityMapper>) -> Self {
+    pub fn new(mut registers: XhciRegisters<IdentityMapper>) -> Self {
+        // xHC Reset
+        registers.reset();
 
-        
+        const DEVICE_SLOTS: u8 = 8;
+        // Set up Device Context
+        registers.write_max_device_slots_enabled(DEVICE_SLOTS);
 
         Self {
             registers

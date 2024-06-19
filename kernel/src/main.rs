@@ -111,8 +111,7 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
 
         let registers = XhciRegisters::new(xhc_mmio_base, IdentityMapper);
 
-        let mut xhc_controller = XhciController::new(registers);
-        xhc_controller.registers.reset();
+        let _xhc_controller = XhciController::new(registers);
         
      } else {
         console.put_string("xHCI Device not found\n");
