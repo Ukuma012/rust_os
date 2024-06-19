@@ -14,8 +14,9 @@ use common::memory_map::MemoryMap;
 use console::Console;
 use graphics::{draw_rectangle, fill_rectangle, Vector2D};
 use pci::scan_all_bus;
+use xhci::registers;
 use crate::graphics::{PixelColor, write_pixel};
-use usb::xhci::mapper::IdentityMapper;
+use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -108,7 +109,10 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
         let xhc_bar = pci::read_bar(&dev, 0).unwrap();
         let xhc_mmio_base = xhc_bar & !(0x0f as u64);
 
-        let registers = unsafe { xhci::registers::Registers::new(xhc_mmio_base.try_into().unwrap(), IdentityMapper) };
+        let registers = XhciRegisters::new(xhc_mmio_base, IdentityMapper);
+
+        let mut xhc_controller = XhciController::new(registers);
+        xhc_controller.registers.reset();
         
      } else {
         console.put_string("xHCI Device not found\n");
