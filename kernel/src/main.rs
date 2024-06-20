@@ -14,7 +14,6 @@ use common::memory_map::MemoryMap;
 use console::Console;
 use graphics::{draw_rectangle, fill_rectangle, Vector2D};
 use pci::scan_all_bus;
-use xhci::registers;
 use crate::graphics::{PixelColor, write_pixel};
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
 
