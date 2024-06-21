@@ -77,7 +77,8 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     draw_rectangle(frame_buffer, Vector2D { x: 10, y: frame_height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
 
     let mut console = Console::new(&green, &black, &frame_buffer);
-    console.put_string("Hello World\n");
+
+    println!(console, "Hello World");
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
@@ -113,7 +114,7 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
         let _xhc_controller = XhciController::new(registers);
         
      } else {
-        console.put_string("xHCI Device not found\n");
+        println!(console, "xHCI Device not found");
      }
 
     loop {

@@ -61,3 +61,19 @@ impl<'a> Console<'a> {
         }
     }
 }
+
+#[macro_export]
+macro_rules! println {
+    ($console:expr, $($arg:tt)*) => ({
+        use core::fmt::Write;
+        let _ = write!($console, $($arg)*);
+        $console.put_string("\n");
+    });
+}
+
+impl<'a> core::fmt::Write for Console<'a> {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.put_string(s);
+        Ok(())
+    }
+}
