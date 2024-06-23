@@ -51,8 +51,8 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &MemoryMap) {
 
-    let frame_width = frame_buffer.resolution.0;
-    let frame_height = frame_buffer.resolution.1;
+    let frame_width = frame_buffer.width();
+    let frame_height = frame_buffer.height();
 
     let green = PixelColor {
         r: 51,

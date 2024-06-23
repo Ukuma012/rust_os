@@ -13,3 +13,13 @@ pub struct FrameBuffer {
     pub resolution: (u32, u32), // (horizontal, vertical)
     pub format: PixelFormat,
 }
+
+impl FrameBuffer {
+    pub fn width(&self) -> u32 {
+        self.resolution.0
+    }
+
+    pub fn height(&self) -> u32 {
+        self.resolution.1
+    }
+}
