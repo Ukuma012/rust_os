@@ -4,7 +4,8 @@
 pub mod graphics;
 pub mod font;
 pub mod console;
-pub mod interrupts;
+pub mod global;
+// pub mod interrupts;
 mod pci;
 mod error;
 mod usb;
@@ -54,23 +55,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     let frame_width = frame_buffer.width();
     let frame_height = frame_buffer.height();
 
-    let green = PixelColor {
-        r: 51,
-        g: 255,
-        b: 51
-    };
-
-    let black = PixelColor {
-        r: 0,
-        g: 0,
-        b: 0 
-    };
-
-    let white = PixelColor {
-        r: 255,
-        g: 255,
-        b: 255 
-    };
+    let green = PixelColor::GREEN;
+    let white = PixelColor::WHITE;
+    let black = PixelColor::BLACK;
 
     fill_rectangle(frame_buffer, Vector2D { x: 0, y: 0 }, Vector2D { x: frame_width, y: frame_height }, &PixelColor {r: 30, g: 144, b: 255});
     fill_rectangle(frame_buffer, Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });

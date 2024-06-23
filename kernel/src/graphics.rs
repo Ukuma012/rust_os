@@ -22,6 +22,27 @@ pub struct PixelColor {
     pub b: u8,
 }
 
+#[allow(dead_code)]
+impl PixelColor {
+    pub const WHITE: Self = Self {
+        r: 0xFF,
+        g: 0xFF,
+        b: 0xFF,
+    };
+
+    pub const BLACK: Self = Self {
+        r: 0x00,
+        g: 0x00,
+        b: 0x00,
+    };
+
+    pub const GREEN: Self = Self {
+        r: 0x00,
+        g: 0xFF,
+        b: 0x00,
+    };
+}
+
 pub fn write_pixel(config: &FrameBuffer, x: u32, y: u32, c: &PixelColor) {
     let pixel_position = config.stride * y + x;
     let base: isize = (4 * pixel_position) as isize;
