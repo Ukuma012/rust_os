@@ -4,7 +4,6 @@
 pub mod graphics;
 pub mod font;
 pub mod console;
-pub mod global;
 // pub mod interrupts;
 mod pci;
 mod error;
