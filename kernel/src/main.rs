@@ -4,6 +4,7 @@
 pub mod graphics;
 pub mod font;
 pub mod console;
+pub mod interrupts;
 mod pci;
 mod error;
 mod usb;

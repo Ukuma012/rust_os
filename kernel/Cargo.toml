@@ -10,3 +10,4 @@ lazy_static = {version = "1.4.0", features = ["spin_no_std"]}
 spin = "0.9.8"
 xhci = {workspace = true}
 modular-bitfield = {workspace = true}
+x86_64 = {workspace = true}
