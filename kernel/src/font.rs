@@ -1,5 +1,5 @@
 use common::frame_buffer::FrameBufferConfig;
-use crate::graphics::{PixelColor, write_pixel};
+use crate::graphics::PixelColor;
 
 pub fn write_ascii(config: &FrameBufferConfig, x: u32, y: u32, c: char, color: &PixelColor) {
     let font = unsafe {get_font(c)};
@@ -12,7 +12,7 @@ pub fn write_ascii(config: &FrameBufferConfig, x: u32, y: u32, c: char, color: &
         for dx in 0..8 {
             let bits = unsafe{*font.offset(dy)};
             if (bits << dx) & 0x80 != 0 {
-                write_pixel(config, x+dx, y+dy as u32, color)
+                // write_pixel(config, x+dx, y+dy as u32, color)
             }
         }
     }

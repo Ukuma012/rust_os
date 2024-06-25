@@ -14,11 +14,12 @@ use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::Console;
-use graphics::{draw_rectangle, fill_rectangle, Vector2D};
+use graphics::Vector2D;
 use pci::scan_all_bus;
 use x86_64::structures::paging::frame;
-use crate::graphics::{PixelColor, write_pixel};
+use crate::graphics::PixelColor;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
+use frame_buffer::FrameBuffer;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -55,16 +56,17 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
 
     let frame_width = frame_buffer.width();
     let frame_height = frame_buffer.height();
-    // frame_buffer_init(frame_buffer);
+    let fb = FrameBuffer::new(*frame_buffer);
 
     let green = PixelColor::GREEN;
     let white = PixelColor::WHITE;
     let black = PixelColor::BLACK;
 
-    fill_rectangle(frame_buffer, Vector2D { x: 0, y: 0 }, Vector2D { x: frame_width, y: frame_height }, &PixelColor {r: 30, g: 144, b: 255});
-    fill_rectangle(frame_buffer, Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
-    fill_rectangle(frame_buffer, Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
-    draw_rectangle(frame_buffer, Vector2D { x: 10, y: frame_height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
+    fb.writer.fill_rectangle(Vector2D { x: 0, y: 0 }, Vector2D { x: frame_width, y: frame_height }, &PixelColor {r: 30, g: 144, b: 255});
+    fb.writer.fill_rectangle(Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
+    fb.writer.fill_rectangle(Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
+    fb.writer.draw_rectangle(Vector2D { x: 10, y: frame_height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
+
 
     // let mut console = Console::new(&green, &black, &frame_buffer);
 
@@ -73,9 +75,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
             if MOUSE_CURSOR_SHAPE[y][x] == '@' {
-                write_pixel(frame_buffer, 200+x as u32, 100+y as u32, &white);
+                fb.writer.write_pixel(200+x as u32, 100+y as u32, &white);
             } else if MOUSE_CURSOR_SHAPE[y][x] == '.' {
-                write_pixel(frame_buffer, 200+x as u32, 100+y as u32, &black);
+                fb.writer.write_pixel(200+x as u32, 100+y as u32, &black);
             }
         }
     }

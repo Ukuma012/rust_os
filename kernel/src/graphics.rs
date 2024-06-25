@@ -43,34 +43,46 @@ impl PixelColor {
     };
 }
 
-pub fn write_pixel(config: &FrameBufferConfig, x: u32, y: u32, c: &PixelColor) {
-    let pixel_position = config.stride * y + x;
-    let base: isize = (4 * pixel_position) as isize;
-
-    unsafe {
-        let p = config.frame_buffer.offset(base);
-            *p.offset(0) = c.b;
-            *p.offset(1) = c.g;
-            *p.offset(2) = c.r;
-    }
+pub struct FrameBufferWriter {
+    config: FrameBufferConfig,
 }
 
-pub fn fill_rectangle(frame_buffer: &FrameBufferConfig, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
-    for y in 0..size.y {
-        for x in 0..size.x {
-            write_pixel(frame_buffer, pos.x + x, pos.y + y, color);
+impl FrameBufferWriter {
+    pub fn new(config: FrameBufferConfig) -> Self {
+        Self {
+            config
         }
     }
-}
 
-pub fn draw_rectangle(frame_buffer: &FrameBufferConfig, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
-    for x in 0..size.x {
-        write_pixel(frame_buffer, pos.x + x, pos.y, color);
-        write_pixel(frame_buffer, pos.x + x, pos.y + size.y, color);
+    pub fn write_pixel(&self, x: u32, y: u32, c: &PixelColor) -> () {
+        let pixel_position = self.config.stride * y + x;
+        let base: isize = (4 * pixel_position) as isize;
+
+        unsafe {
+            let p = self.config.frame_buffer.offset(base);
+                *p.offset(0) = c.b;
+                *p.offset(1) = c.g;
+                *p.offset(2) = c.r;
+        }
     }
 
-    for y in 1..size.y-1 {
-        write_pixel(frame_buffer, pos.x, pos.y + y, color);
-        write_pixel(frame_buffer, pos.x + size.x - 1, pos.y + y, color);
+    pub fn fill_rectangle(&self, pos: Vector2D<u32>, size: Vector2D<u32>, c: &PixelColor) -> () {
+        for y in 0..size.y {
+            for x in 0..size.x {
+                self.write_pixel(pos.x + x, pos.y + y, c)
+            }
+        }
+    }
+
+    pub fn draw_rectangle(&self, pos: Vector2D<u32>, size: Vector2D<u32>, c: &PixelColor) -> () {
+        for x in 0..size.x {
+            self.write_pixel(pos.x+x, pos.y, c);
+            self.write_pixel(pos.x+x, pos.y+size.y, c);
+        }
+
+        for y in 0..size.y-1 {
+            self.write_pixel(pos.x, pos.y+y, c);
+            self.write_pixel(pos.x + size.x - 1, pos.y+y, c);
+        }
     }
 }
