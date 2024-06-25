@@ -1,7 +1,7 @@
-use common::frame_buffer::FrameBuffer;
+use common::frame_buffer::FrameBufferConfig;
 use crate::graphics::{PixelColor, write_pixel};
 
-pub fn write_ascii(config: &FrameBuffer, x: u32, y: u32, c: char, color: &PixelColor) {
+pub fn write_ascii(config: &FrameBufferConfig, x: u32, y: u32, c: char, color: &PixelColor) {
     let font = unsafe {get_font(c)};
     let font = match font {
         None => return,

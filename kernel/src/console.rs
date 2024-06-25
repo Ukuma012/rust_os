@@ -1,4 +1,4 @@
-use common::frame_buffer::FrameBuffer;
+use common::frame_buffer::FrameBufferConfig;
 
 use crate::graphics::PixelColor;
 use crate::font::write_ascii;
@@ -7,7 +7,7 @@ const ROWS: usize = 25;
 const COLUMNS: usize = 80;
 
 pub struct Console <'a>{
-    frame_buffer: &'a FrameBuffer,
+    frame_buffer: &'a FrameBufferConfig,
     fg_color: &'a PixelColor,
     bg_color: &'a PixelColor,
     cursor_row: usize,
@@ -16,7 +16,7 @@ pub struct Console <'a>{
 }
 
 impl<'a> Console<'a> {
-    pub fn new(fg_color: &'a PixelColor, bg_color: &'a PixelColor, frame_buffer: &'a FrameBuffer) -> Console<'a> {
+    pub fn new(fg_color: &'a PixelColor, bg_color: &'a PixelColor, frame_buffer: &'a FrameBufferConfig) -> Console<'a> {
         Self {
             frame_buffer,
             fg_color,

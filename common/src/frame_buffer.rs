@@ -7,14 +7,14 @@ pub enum PixelFormat {
 
 #[repr(C)]
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
-pub struct FrameBuffer {
+pub struct FrameBufferConfig {
     pub frame_buffer: *mut u8,
     pub stride: u32,
     pub resolution: (u32, u32), // (horizontal, vertical)
     pub format: PixelFormat,
 }
 
-impl FrameBuffer {
+impl FrameBufferConfig {
     pub fn width(&self) -> u32 {
         self.resolution.0
     }

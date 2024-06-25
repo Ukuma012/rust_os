@@ -1,5 +1,5 @@
 use core::ops::AddAssign;
-use common::frame_buffer::FrameBuffer;
+use common::frame_buffer::FrameBufferConfig;
 
 pub struct Vector2D<T> {
     pub x: T,
@@ -43,7 +43,7 @@ impl PixelColor {
     };
 }
 
-pub fn write_pixel(config: &FrameBuffer, x: u32, y: u32, c: &PixelColor) {
+pub fn write_pixel(config: &FrameBufferConfig, x: u32, y: u32, c: &PixelColor) {
     let pixel_position = config.stride * y + x;
     let base: isize = (4 * pixel_position) as isize;
 
@@ -55,7 +55,7 @@ pub fn write_pixel(config: &FrameBuffer, x: u32, y: u32, c: &PixelColor) {
     }
 }
 
-pub fn fill_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
+pub fn fill_rectangle(frame_buffer: &FrameBufferConfig, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
     for y in 0..size.y {
         for x in 0..size.x {
             write_pixel(frame_buffer, pos.x + x, pos.y + y, color);
@@ -63,7 +63,7 @@ pub fn fill_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vect
     }
 }
 
-pub fn draw_rectangle(frame_buffer: &FrameBuffer, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
+pub fn draw_rectangle(frame_buffer: &FrameBufferConfig, pos: Vector2D<u32>, size: Vector2D<u32>, color: &PixelColor) {
     for x in 0..size.x {
         write_pixel(frame_buffer, pos.x + x, pos.y, color);
         write_pixel(frame_buffer, pos.x + x, pos.y + size.y, color);

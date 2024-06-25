@@ -46,7 +46,7 @@ fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
     let elf_entry = load_kernel(handle, bs);
 
     trace!("entry_point_addr = 0x{:x}", elf_entry);
-    let entry_point: extern "sysv64" fn(&frame_buffer::FrameBuffer, &memory_map::MemoryMap) = unsafe {
+    let entry_point: extern "sysv64" fn(&frame_buffer::FrameBufferConfig, &memory_map::MemoryMap) = unsafe {
         mem::transmute(elf_entry)
     };
 
@@ -141,10 +141,10 @@ fn load_kernel(_image: Handle, boot_services: &BootServices) -> usize {
     load_elf(&boot_services, buf)
 }
 
-fn get_frame_buffer(boot_services: &BootServices) -> frame_buffer::FrameBuffer {
+fn get_frame_buffer(boot_services: &BootServices) -> frame_buffer::FrameBufferConfig {
     let gop = boot_services.locate_protocol::<GraphicsOutput>().unwrap();
     let gop = unsafe {&mut *gop.get()};
-    frame_buffer::FrameBuffer {
+    frame_buffer::FrameBufferConfig {
         frame_buffer: gop.frame_buffer().as_mut_ptr(),
         stride: gop.current_mode_info().stride() as u32,
         resolution: (

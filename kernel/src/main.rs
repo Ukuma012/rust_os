@@ -4,17 +4,19 @@
 pub mod graphics;
 pub mod font;
 pub mod console;
+pub mod frame_buffer;
 // pub mod interrupts;
 mod pci;
 mod error;
 mod usb;
 
 use core::{panic::PanicInfo, arch::asm};
-use common::frame_buffer::FrameBuffer;
+use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::Console;
 use graphics::{draw_rectangle, fill_rectangle, Vector2D};
 use pci::scan_all_bus;
+use x86_64::structures::paging::frame;
 use crate::graphics::{PixelColor, write_pixel};
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
 
@@ -49,10 +51,11 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 ];
 
 #[no_mangle]
-pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &MemoryMap) {
+pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
 
     let frame_width = frame_buffer.width();
     let frame_height = frame_buffer.height();
+    // frame_buffer_init(frame_buffer);
 
     let green = PixelColor::GREEN;
     let white = PixelColor::WHITE;
@@ -63,9 +66,9 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
     fill_rectangle(frame_buffer, Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
     draw_rectangle(frame_buffer, Vector2D { x: 10, y: frame_height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
 
-    let mut console = Console::new(&green, &black, &frame_buffer);
+    // let mut console = Console::new(&green, &black, &frame_buffer);
 
-    println!(console, "Hello World");
+    // println!(console, "Hello World");
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
@@ -101,7 +104,7 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBuffer, _memory_map: &Mem
         let _xhc_controller = XhciController::new(registers);
         
      } else {
-        println!(console, "xHCI Device not found");
+        // println!(console, "xHCI Device not found");
      }
 
     loop {
