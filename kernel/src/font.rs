@@ -1,4 +1,3 @@
-use common::frame_buffer::FrameBufferConfig;
 use crate::graphics::PixelColor;
 
 // pub fn write_ascii<W: PixelWriter>(writer: &mut W, x: u32, y: u32, c: char, color: &PixelColor) {
