@@ -1,6 +1,6 @@
 use common::frame_buffer::FrameBufferConfig;
 
-use crate::graphics::FrameBufferWriter;
+use crate::graphics::{FrameBufferWriter, PixelColor};
 
 pub struct FrameBuffer {
     config: FrameBufferConfig,

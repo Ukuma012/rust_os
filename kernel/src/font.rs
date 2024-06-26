@@ -1,22 +1,22 @@
 use common::frame_buffer::FrameBufferConfig;
 use crate::graphics::PixelColor;
 
-pub fn write_ascii(config: &FrameBufferConfig, x: u32, y: u32, c: char, color: &PixelColor) {
-    let font = unsafe {get_font(c)};
-    let font = match font {
-        None => return,
-        Some(f) => f,
-    };
+// pub fn write_ascii<W: PixelWriter>(writer: &mut W, x: u32, y: u32, c: char, color: &PixelColor) {
+//     let font = unsafe {get_font(c)};
+//     let font = match font {
+//         None => return,
+//         Some(f) => f,
+//     };
 
-    for dy in 0..16 {
-        for dx in 0..8 {
-            let bits = unsafe{*font.offset(dy)};
-            if (bits << dx) & 0x80 != 0 {
-                // write_pixel(config, x+dx, y+dy as u32, color)
-            }
-        }
-    }
-}
+//     for dy in 0..16 {
+//         for dx in 0..8 {
+//             let bits = unsafe{*font.offset(dy)};
+//             if (bits << dx) & 0x80 != 0 {
+//                 writer.write(x+dx, y+dy as u32, color);
+//             }
+//         }
+//     }
+// }
 
 extern "C" {
     static _binary_hankaku_bin_start: u8;

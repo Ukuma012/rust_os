@@ -1,13 +1,12 @@
-use common::frame_buffer::FrameBufferConfig;
+use core::fmt;
 
 use crate::graphics::PixelColor;
-use crate::font::write_ascii;
+// use crate::font::write_ascii;
 
 const ROWS: usize = 25;
 const COLUMNS: usize = 80;
 
 pub struct Console <'a>{
-    frame_buffer: &'a FrameBufferConfig,
     fg_color: &'a PixelColor,
     bg_color: &'a PixelColor,
     cursor_row: usize,
@@ -16,9 +15,8 @@ pub struct Console <'a>{
 }
 
 impl<'a> Console<'a> {
-    pub fn new(fg_color: &'a PixelColor, bg_color: &'a PixelColor, frame_buffer: &'a FrameBufferConfig) -> Console<'a> {
+    pub fn new(fg_color: &'a PixelColor, bg_color: &'a PixelColor) -> Console<'a> {
         Self {
-            frame_buffer,
             fg_color,
             bg_color,
             cursor_row: 0,
@@ -33,7 +31,7 @@ impl<'a> Console<'a> {
                 self.new_line();
                 continue;
             } else if self.cursor_column < COLUMNS - 1 {
-               write_ascii(&self.frame_buffer, 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color) 
+                // write_ascii(pixel_writer(), 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color)
             }
             self.buffer[self.cursor_row][self.cursor_column] = char;
             self.cursor_column += 1;
@@ -50,30 +48,14 @@ impl<'a> Console<'a> {
                 self.buffer[row - 1] = self.buffer[row];
                 for col in 0..COLUMNS {
                     let char = self.buffer[row - 1][col];
-                    write_ascii(&self.frame_buffer, 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
+                    // write_ascii(graphics_global::pixel_writer(), 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
                 }
             }
             self.buffer[ROWS - 1] = [char::from(0); COLUMNS + 1];
 
             for col in 0..COLUMNS {
-                write_ascii(&self.frame_buffer, 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color);
+                // write_ascii(graphics_global::pixel_writer(), 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color);
             }
         }
-    }
-}
-
-#[macro_export]
-macro_rules! println {
-    ($console:expr, $($arg:tt)*) => ({
-        use core::fmt::Write;
-        let _ = write!($console, $($arg)*);
-        $console.put_string("\n");
-    });
-}
-
-impl<'a> core::fmt::Write for Console<'a> {
-    fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.put_string(s);
-        Ok(())
     }
 }

@@ -57,20 +57,12 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     let frame_width = frame_buffer.width();
     let frame_height = frame_buffer.height();
     let fb = FrameBuffer::new(*frame_buffer);
+    fb.writer.draw_desktop(frame_width, frame_height);
 
     let green = PixelColor::GREEN;
     let white = PixelColor::WHITE;
     let black = PixelColor::BLACK;
 
-    fb.writer.fill_rectangle(Vector2D { x: 0, y: 0 }, Vector2D { x: frame_width, y: frame_height }, &PixelColor {r: 30, g: 144, b: 255});
-    fb.writer.fill_rectangle(Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
-    fb.writer.fill_rectangle(Vector2D { x: 0, y: frame_height - 50 }, Vector2D { x: frame_width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
-    fb.writer.draw_rectangle(Vector2D { x: 10, y: frame_height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
-
-
-    // let mut console = Console::new(&green, &black, &frame_buffer);
-
-    // println!(console, "Hello World");
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {

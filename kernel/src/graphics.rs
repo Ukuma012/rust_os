@@ -41,6 +41,18 @@ impl PixelColor {
         g: 0xFF,
         b: 0x00,
     };
+
+    pub const DESKTOP_BG: Self = Self {
+        r: 45,
+        g: 118,
+        b: 237,
+    };
+
+    pub const DESKTOP_FG: Self = Self {
+        r: 0xFF,
+        g: 0xFF,
+        b: 0xFF,
+    };
 }
 
 pub struct FrameBufferWriter {
@@ -84,5 +96,16 @@ impl FrameBufferWriter {
             self.write_pixel(pos.x, pos.y+y, c);
             self.write_pixel(pos.x + size.x - 1, pos.y+y, c);
         }
+    }
+
+    pub fn draw_desktop(&self, width: u32, height: u32) {
+        let green = PixelColor::GREEN;
+        let white = PixelColor::WHITE;
+        let black = PixelColor::BLACK;
+
+        self.fill_rectangle(Vector2D { x: 0, y: 0 }, Vector2D { x: width, y: height }, &PixelColor {r: 30, g: 144, b: 255});
+        self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
+        self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
+        self.draw_rectangle(Vector2D { x: 10, y: height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
     }
 }
