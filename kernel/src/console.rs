@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::graphics::PixelColor;
+use crate::graphics::{self, PixelColor};
 
 const ROWS: usize = 25;
 const COLUMNS: usize = 80;
@@ -30,7 +30,7 @@ impl<'a> Console<'a> {
                 self.new_line();
                 continue;
             } else if self.cursor_column < COLUMNS - 1 {
-                // write_ascii(pixel_writer(), 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color)
+                // write_ascii(&pixel_writer(), 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color)
             }
             self.buffer[self.cursor_row][self.cursor_column] = char;
             self.cursor_column += 1;
@@ -47,13 +47,13 @@ impl<'a> Console<'a> {
                 self.buffer[row - 1] = self.buffer[row];
                 for col in 0..COLUMNS {
                     let char = self.buffer[row - 1][col];
-                    // write_ascii(graphics_global::pixel_writer(), 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
+                    // write_ascii(pixel_writer(), 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
                 }
             }
             self.buffer[ROWS - 1] = [char::from(0); COLUMNS + 1];
 
             for col in 0..COLUMNS {
-                // write_ascii(graphics_global::pixel_writer(), 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color);
+                // write_ascii(pixel_writer(), 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color);
             }
         }
     }

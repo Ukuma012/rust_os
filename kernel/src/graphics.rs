@@ -78,6 +78,7 @@ impl FrameBufferWriter {
         }
     }
 
+
     pub fn fill_rectangle(&self, pos: Vector2D<u32>, size: Vector2D<u32>, c: &PixelColor) -> () {
         for y in 0..size.y {
             for x in 0..size.x {
