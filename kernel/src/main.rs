@@ -2,7 +2,6 @@
 #![no_main]
 
 pub mod graphics;
-pub mod font;
 pub mod console;
 pub mod frame_buffer;
 // pub mod interrupts;
@@ -54,22 +53,16 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
 
-    let frame_width = frame_buffer.width();
-    let frame_height = frame_buffer.height();
     let fb = FrameBuffer::new(*frame_buffer);
-    fb.writer.draw_desktop(frame_width, frame_height);
-
-    let green = PixelColor::GREEN;
-    let white = PixelColor::WHITE;
-    let black = PixelColor::BLACK;
-
+    fb.writer.draw_desktop(frame_buffer.width(), frame_buffer.height());
+    fb.writer.write_ascii(300, 300, 'A', &PixelColor::BLACK);
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
             if MOUSE_CURSOR_SHAPE[y][x] == '@' {
-                fb.writer.write_pixel(200+x as u32, 100+y as u32, &white);
+                fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::WHITE);
             } else if MOUSE_CURSOR_SHAPE[y][x] == '.' {
-                fb.writer.write_pixel(200+x as u32, 100+y as u32, &black);
+                fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::BLACK);
             }
         }
     }
