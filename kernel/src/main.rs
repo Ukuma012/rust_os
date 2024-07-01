@@ -12,8 +12,8 @@ mod usb;
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
-use console::Console;
-use graphics::Vector2D;
+use console::{console_global, Console};
+use graphics::{graphics_global, Vector2D};
 use pci::scan_all_bus;
 use x86_64::structures::paging::frame;
 use crate::graphics::PixelColor;
@@ -53,9 +53,14 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
 
+    graphics_global::init(*frame_buffer);
+    console_global::init();
+
+
     let fb = FrameBuffer::new(*frame_buffer);
     fb.writer.draw_desktop(frame_buffer.width(), frame_buffer.height());
-    fb.writer.write_ascii(300, 300, 'A', &PixelColor::BLACK);
+
+    printk!("Welcome to Rust OS!\n");
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
@@ -104,4 +109,9 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {
         unsafe {asm!("hlt")}
     }
+}
+
+#[macro_export]
+macro_rules! printk {
+    ($($arg:tt)*) => ($crate::console_global::_printk(format_args!($($arg)*)));
 }

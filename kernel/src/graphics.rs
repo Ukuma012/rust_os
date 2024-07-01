@@ -57,12 +57,14 @@ impl PixelColor {
 
 pub struct FrameBufferWriter {
     config: FrameBufferConfig,
+    write_fn: fn(&Self, x: u32, y: u32, &PixelColor) -> (),
 }
 
 impl FrameBufferWriter {
     pub fn new(config: FrameBufferConfig) -> Self {
         Self {
-            config
+            config,
+            write_fn: Self::write_pixel
         }
     }
 
@@ -124,6 +126,61 @@ impl FrameBufferWriter {
                     self.write_pixel(x+dx, y+dy as u32, color);
                 }
             }
+        }
+    }
+}
+
+pub trait PixelWriter {
+    fn write(&mut self, x: u32, y: u32, color: &PixelColor);
+}
+
+impl PixelWriter for FrameBufferWriter {
+    fn write(&mut self, x: u32, y: u32, color: &PixelColor) {
+        ((self.write_fn)(self, x, y, color));
+    }
+}
+
+pub fn write_ascii<W: PixelWriter>(writer: &mut W, x: u32, y: u32, c: char, color: &PixelColor) -> () {
+    let font = unsafe {get_font(c)};
+    let font = match font {
+        None => return,
+        Some(f) => f,
+    };
+
+    for dy in 0..16 {
+        for dx in 0..8 {
+            let bits = unsafe {*font.offset(dy)};
+            if (bits << dx) & 0x80 != 0 {
+                writer.write(x+dx, y+dy as u32, color);
+            }
+        }
+    } 
+}
+
+pub mod graphics_global {
+    use common::frame_buffer::FrameBufferConfig;
+
+    use super::FrameBufferWriter;
+
+    static mut FRAME_BUFFER_CONFIG: Option<FrameBufferConfig> = None;
+    static mut WRITER: Option<FrameBufferWriter> = None;
+
+    pub fn init(config: FrameBufferConfig) {
+        unsafe {
+            FRAME_BUFFER_CONFIG = Some(config);
+            WRITER = Some(FrameBufferWriter::new(config));
+        };
+    }
+
+    pub fn frame_buffer_config() -> &'static mut FrameBufferConfig {
+        unsafe {
+            FRAME_BUFFER_CONFIG.as_mut().unwrap()
+        }
+    }
+
+    pub fn pixel_writer() -> &'static mut FrameBufferWriter {
+        unsafe {
+            WRITER.as_mut().unwrap()
         }
     }
 }
