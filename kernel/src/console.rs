@@ -91,3 +91,14 @@ impl<'a> fmt::Write for Console<'a> {
         Ok(())
     }
 }
+
+#[macro_export]
+macro_rules! printk {
+    ($($arg:tt)*) => ($crate::console_global::_printk(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => (printk!("\n"));
+    ($($arg:tt)*) => (printk!("{}\n", format_args!($($arg)*)));
+}
