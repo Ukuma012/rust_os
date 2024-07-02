@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::graphics::{graphics_global::{self, pixel_writer}, write_ascii, PixelColor};
+use crate::graphics::graphics_global::{self, write_ascii, PixelColor};
 
 const ROWS: usize = 25;
 const COLUMNS: usize = 80;
