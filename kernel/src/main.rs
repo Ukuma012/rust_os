@@ -96,7 +96,7 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
         let _xhc_controller = XhciController::new(registers);
         
      } else {
-        printk!("xHCI Device not found");
+        println!("xHCI Device not found");
      }
 
     loop {
