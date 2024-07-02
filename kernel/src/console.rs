@@ -71,25 +71,25 @@ pub mod console_global {
     use crate::graphics::PixelColor;
     use core::fmt;
     use core::fmt::Write;
-
+    use spin::mutex::Mutex;
+    use lazy_static::lazy_static;
     use super::Console;
 
-    static mut CONSOLE: Option<Console<'static>> = None;
-
-    pub fn init() -> () {
-        unsafe {
-            CONSOLE = Some(Console::new(&PixelColor::DESKTOP_FG, &PixelColor::DESKTOP_BG))
-        };
+    lazy_static! {
+        static ref CONSOLE: Mutex<Option<Console<'static>>> = Mutex::new(None);
     }
 
-    pub fn console() -> &'static mut Console<'static> {
-        unsafe {
-            CONSOLE.as_mut().unwrap()
-        }
+    pub fn init() -> () {
+        let mut console = CONSOLE.lock();
+        *console = Some(Console::new(&PixelColor::DESKTOP_FG, &PixelColor::DESKTOP_BG));
+    }
+
+    fn console() -> spin::MutexGuard<'static, Option<Console<'static>>> {
+        CONSOLE.lock()
     }
 
     pub fn _printk(args: fmt::Arguments) {
-        console().write_fmt(args).unwrap();
+        console().as_mut().unwrap().write_fmt(args).unwrap();
     }
 }
 
