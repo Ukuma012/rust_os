@@ -51,7 +51,6 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
-
     graphics_global::init(*frame_buffer);
     console_global::init();
 
@@ -104,7 +103,8 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {
         unsafe {asm!("hlt")}
     }
