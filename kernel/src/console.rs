@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::{graphics::{self, graphics_global::pixel_writer, write_ascii, PixelColor}, printk};
+use crate::graphics::{graphics_global::{self, pixel_writer}, write_ascii, PixelColor};
 
 const ROWS: usize = 25;
 const COLUMNS: usize = 80;
@@ -25,12 +25,15 @@ impl<'a> Console<'a> {
     }
 
     pub fn put_string(&mut self, str: &str) {
+        let mut writer_guard = graphics_global::pixel_writer();
         for char in str.chars() {
             if char == '\n' {
                 self.new_line();
                 continue;
             } else if self.cursor_column < COLUMNS - 1 {
-                write_ascii(pixel_writer(), 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color)
+                if let Some(writer) = writer_guard.as_mut() {
+                    write_ascii(writer, 8 * self.cursor_column as u32, 16 * self.cursor_row as u32, char, &self.fg_color)
+                }
             }
             self.buffer[self.cursor_row][self.cursor_column] = char;
             self.cursor_column += 1;
@@ -43,17 +46,22 @@ impl<'a> Console<'a> {
             self.cursor_row += 1;
             return;
         } else {
+            let mut writer_guard = graphics_global::pixel_writer();
             for row in 1..ROWS {
                 self.buffer[row - 1] = self.buffer[row];
                 for col in 0..COLUMNS {
                     let char = self.buffer[row - 1][col];
-                    write_ascii(pixel_writer(), 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
+                    if let Some(writer) = writer_guard.as_mut() {
+                        write_ascii(writer, 8 * col as u32, 16 * (row - 1) as u32, char, &self.fg_color);
+                    }
                 }
             }
             self.buffer[ROWS - 1] = [char::from(0); COLUMNS + 1];
 
             for col in 0..COLUMNS {
-                write_ascii(pixel_writer(), 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color)
+                if let Some(writer) = writer_guard.as_mut() {
+                    write_ascii(writer, 8 * col as u32, 16 * (ROWS - 1) as u32, ' ', &self.fg_color)
+                }
             }
         }
     }

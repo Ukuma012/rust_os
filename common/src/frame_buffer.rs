@@ -14,6 +14,8 @@ pub struct FrameBufferConfig {
     pub format: PixelFormat,
 }
 
+unsafe impl Send for FrameBufferConfig {}
+
 impl FrameBufferConfig {
     pub fn width(&self) -> u32 {
         self.resolution.0

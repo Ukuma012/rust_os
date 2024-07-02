@@ -102,10 +102,6 @@ impl FrameBufferWriter {
     }
 
     pub fn draw_desktop(&self, width: u32, height: u32) {
-        let green = PixelColor::GREEN;
-        let white = PixelColor::WHITE;
-        let black = PixelColor::BLACK;
-
         self.fill_rectangle(Vector2D { x: 0, y: 0 }, Vector2D { x: width, y: height }, &PixelColor {r: 30, g: 144, b: 255});
         self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
         self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
@@ -159,29 +155,30 @@ pub fn write_ascii<W: PixelWriter>(writer: &mut W, x: u32, y: u32, c: char, colo
 
 pub mod graphics_global {
     use common::frame_buffer::FrameBufferConfig;
-
+    use spin::mutex::Mutex;
+    use lazy_static::lazy_static;
     use super::FrameBufferWriter;
 
-    static mut FRAME_BUFFER_CONFIG: Option<FrameBufferConfig> = None;
-    static mut WRITER: Option<FrameBufferWriter> = None;
+    lazy_static! {
+        static ref FRAME_BUFFER_CONFIG: Mutex<Option<FrameBufferConfig>> = Mutex::new(None);
+        static ref WRITER: Mutex<Option<FrameBufferWriter>> = Mutex::new(None);
+    }
+
 
     pub fn init(config: FrameBufferConfig) {
-        unsafe {
-            FRAME_BUFFER_CONFIG = Some(config);
-            WRITER = Some(FrameBufferWriter::new(config));
-        };
+        let mut fb_config = FRAME_BUFFER_CONFIG.lock();
+        let mut writer = WRITER.lock();
+
+        *fb_config = Some(config);
+        *writer = Some(FrameBufferWriter::new(config));
     }
 
-    pub fn frame_buffer_config() -> &'static mut FrameBufferConfig {
-        unsafe {
-            FRAME_BUFFER_CONFIG.as_mut().unwrap()
-        }
+    pub fn frame_buffer_config() -> spin::MutexGuard<'static, Option<FrameBufferConfig>> {
+        FRAME_BUFFER_CONFIG.lock()
     }
 
-    pub fn pixel_writer() -> &'static mut FrameBufferWriter {
-        unsafe {
-            WRITER.as_mut().unwrap()
-        }
+    pub fn pixel_writer() -> spin::MutexGuard<'static, Option<FrameBufferWriter>> {
+        WRITER.lock()
     }
 }
 

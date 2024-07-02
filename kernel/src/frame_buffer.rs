@@ -1,5 +1,5 @@
 use common::frame_buffer::FrameBufferConfig;
-use crate::graphics::{FrameBufferWriter, PixelColor};
+use crate::graphics::FrameBufferWriter;
 
 pub struct FrameBuffer {
     config: FrameBufferConfig,
