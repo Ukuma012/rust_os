@@ -61,6 +61,8 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     interrupts::init_idt();
     x86_64::instructions::interrupts::int3();
 
+    println!("{}", "it didn't crash!");
+
 
     // for y in 0..K_MOUSE_CURSOR_HEIGHT {
     //     for x in 0..K_MOUSE_CURSOR_WIDTH {

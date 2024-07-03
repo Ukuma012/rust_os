@@ -82,7 +82,7 @@ pub mod console_global {
 
     pub fn init() -> () {
         let mut console = CONSOLE.lock();
-        *console = Some(Console::new(&PixelColor::DESKTOP_FG, &PixelColor::DESKTOP_BG));
+        *console = Some(Console::new(&PixelColor::GREEN, &PixelColor::DESKTOP_BG));
     }
 
     fn console() -> spin::MutexGuard<'static, Option<Console<'static>>> {
