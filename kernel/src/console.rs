@@ -108,6 +108,6 @@ macro_rules! printk {
 
 #[macro_export]
 macro_rules! println {
-    () => (printk!("\n"));
-    ($($arg:tt)*) => (printk!("{}\n", format_args!($($arg)*)));
+    () => ($crate::printk!("\n"));
+    ($($arg:tt)*) => ($crate::printk!("{}\n", format_args!($($arg)*)));
 }

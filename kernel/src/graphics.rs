@@ -164,7 +164,6 @@ pub mod graphics_global {
         static ref WRITER: Mutex<Option<FrameBufferWriter>> = Mutex::new(None);
     }
 
-
     pub fn init(config: FrameBufferConfig) {
         let mut fb_config = FRAME_BUFFER_CONFIG.lock();
         let mut writer = WRITER.lock();

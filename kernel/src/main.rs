@@ -1,10 +1,11 @@
 #![no_std]
 #![no_main]
+#![feature(abi_x86_interrupt)]
 
 pub mod graphics;
 pub mod console;
 pub mod frame_buffer;
-// pub mod interrupts;
+pub mod interrupts;
 mod pci;
 mod error;
 mod usb;
@@ -13,7 +14,7 @@ use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::console_global;
-use graphics::graphics_global;
+use graphics::graphics_global::{self, pixel_writer};
 use pci::scan_all_bus;
 use crate::graphics::PixelColor;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
@@ -54,21 +55,22 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     graphics_global::init(*frame_buffer);
     console_global::init();
 
-
-    let fb = FrameBuffer::new(*frame_buffer);
-    fb.writer.draw_desktop(frame_buffer.width(), frame_buffer.height());
+    pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
 
     println!("{}", "Hello World");
+    interrupts::init_idt();
+    x86_64::instructions::interrupts::int3();
 
-    for y in 0..K_MOUSE_CURSOR_HEIGHT {
-        for x in 0..K_MOUSE_CURSOR_WIDTH {
-            if MOUSE_CURSOR_SHAPE[y][x] == '@' {
-                fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::WHITE);
-            } else if MOUSE_CURSOR_SHAPE[y][x] == '.' {
-                fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::BLACK);
-            }
-        }
-    }
+
+    // for y in 0..K_MOUSE_CURSOR_HEIGHT {
+    //     for x in 0..K_MOUSE_CURSOR_WIDTH {
+    //         if MOUSE_CURSOR_SHAPE[y][x] == '@' {
+    //             fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::WHITE);
+    //         } else if MOUSE_CURSOR_SHAPE[y][x] == '.' {
+    //             fb.writer.write_pixel(200+x as u32, 100+y as u32, &PixelColor::BLACK);
+    //         }
+    //     }
+    // }
 
     let _all_buses = scan_all_bus().unwrap();
     let num_devices = pci::NUM_DEVICE.lock();
