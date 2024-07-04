@@ -54,13 +54,19 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     console_global::init();
 
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
-
     println!("{}", "Hello World");
+
     interrupts::init_idt();
-    x86_64::instructions::interrupts::int3();
 
-    println!("{}", "it didn't crash!");
+    unsafe {
+        *(0xdeaddeaddead as *mut u8) = 42;
+    };
 
+    println!("{}", "It didn't crash!");
+
+    loop {
+        unsafe {asm!("hlt")}
+    }
 
     // for y in 0..K_MOUSE_CURSOR_HEIGHT {
     //     for x in 0..K_MOUSE_CURSOR_WIDTH {
@@ -72,36 +78,33 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     //     }
     // }
 
-    let _all_buses = scan_all_bus().unwrap();
-    let num_devices = pci::NUM_DEVICE.lock();
-    let devices = pci::DEVICES.lock();
-    let mut xhc_dev: Option<pci::Device> = None;
-    for i in 0..*num_devices {
-            if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
-                xhc_dev = Some(devices[i]);
+    // let _all_buses = scan_all_bus().unwrap();
+    // let num_devices = pci::NUM_DEVICE.lock();
+    // let devices = pci::DEVICES.lock();
+    // let mut xhc_dev: Option<pci::Device> = None;
+    // for i in 0..*num_devices {
+    //         if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
+    //             xhc_dev = Some(devices[i]);
 
-                // Prioritize Intel Products
-                if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
-                    break;
-                }
-            }
-     }
+    //             // Prioritize Intel Products
+    //             if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
+    //                 break;
+    //             }
+    //         }
+    //  }
 
-     if let Some(dev) = xhc_dev {
-        let xhc_bar = pci::read_bar(&dev, 0).unwrap();
-        let xhc_mmio_base = xhc_bar & !(0x0f as u64);
+    //  if let Some(dev) = xhc_dev {
+    //     let xhc_bar = pci::read_bar(&dev, 0).unwrap();
+    //     let xhc_mmio_base = xhc_bar & !(0x0f as u64);
 
-        let registers = XhciRegisters::new(xhc_mmio_base, IdentityMapper);
+    //     let registers = XhciRegisters::new(xhc_mmio_base, IdentityMapper);
 
-        let _xhc_controller = XhciController::new(registers);
+    //     let _xhc_controller = XhciController::new(registers);
         
-     } else {
-        println!("xHCI Device not found");
-     }
+    //  } else {
+    //     println!("xHCI Device not found");
+    //  }
 
-    loop {
-        unsafe {asm!("hlt")}
-    }
 }
 
 #[panic_handler]
