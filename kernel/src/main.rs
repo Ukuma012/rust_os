@@ -16,9 +16,7 @@ use common::memory_map::MemoryMap;
 use console::console_global;
 use graphics::graphics_global::{self, pixel_writer};
 use pci::scan_all_bus;
-use crate::graphics::PixelColor;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
-use frame_buffer::FrameBuffer;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
