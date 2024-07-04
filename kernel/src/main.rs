@@ -6,6 +6,7 @@ pub mod graphics;
 pub mod console;
 pub mod frame_buffer;
 pub mod interrupts;
+pub mod gdt;
 mod pci;
 mod error;
 mod usb;
@@ -48,19 +49,19 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '@', '@', '@', ' ', ' ', ' '],
 ];
 
+fn stack_overflow() {
+    stack_overflow();
+}
+
 #[no_mangle]
 pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
-    graphics_global::init(*frame_buffer);
-    console_global::init();
+    init(frame_buffer);
 
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
+
     println!("{}", "Hello World");
 
-    interrupts::init_idt();
-
-    unsafe {
-        *(0xdeaddeaddead as *mut u8) = 42;
-    };
+    stack_overflow();
 
     println!("{}", "It didn't crash!");
 
@@ -105,6 +106,13 @@ pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map
     //     println!("xHCI Device not found");
     //  }
 
+}
+
+fn init(config: &FrameBufferConfig) {
+    graphics_global::init(*config);
+    console_global::init();
+    gdt::init();
+    interrupts::init_idt();
 }
 
 #[panic_handler]
