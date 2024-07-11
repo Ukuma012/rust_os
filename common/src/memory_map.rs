@@ -16,6 +16,9 @@ impl MemoryMap {
 #[repr(C)]
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
 pub struct Descriptor {
+    pub memory_type: u32,
     pub phys_start: u64,
     pub phys_end: u64,
+    pub virt_start: u64,
+    pub att: u64,
 }

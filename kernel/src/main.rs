@@ -50,12 +50,16 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 ];
 
 #[no_mangle]
-pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
+pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
+
     init(frame_buffer);
-
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
-
     println!("{}", "Hello World!");
+
+    let descriptors = memory_map.descriptors();
+    descriptors.iter().for_each(|descriptor| {
+         println!("{}, {}, {}, {}, {}", descriptor.memory_type, descriptor.phys_start, descriptor.phys_end, descriptor.virt_start, descriptor.att);
+    });
 
     println!("{}", "It didn't crash!");
 

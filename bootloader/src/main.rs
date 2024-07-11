@@ -175,8 +175,11 @@ fn exit_boot_services(
     for d in raw_descriptors {
         if is_available_after_exit_boot_services(d.ty) {
             descriptors.push(memory_map::Descriptor {
+                memory_type: d.ty.0,
                 phys_start: d.phys_start,
                 phys_end: d.phys_start + d.page_count * UEFI_PAGE_SIZE as u64,
+                virt_start: d.virt_start,
+                att: d.att.bits(),
             });
         }
     }
