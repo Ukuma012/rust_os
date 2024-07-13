@@ -50,7 +50,7 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 ];
 
 #[no_mangle]
-pub extern "sysv64" fn kernel_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
+pub extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
 
     init(frame_buffer);
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
