@@ -2,15 +2,16 @@
 #![no_main]
 #![feature(abi_x86_interrupt)]
 
-pub mod graphics;
-pub mod console;
-pub mod frame_buffer;
-pub mod interrupts;
-pub mod gdt;
-pub mod usb;
+mod graphics;
+mod console;
+mod frame_buffer;
+mod interrupts;
+mod gdt;
+mod usb;
 mod paging;
 mod pci;
 mod error;
+mod memory_manager;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
