@@ -7,10 +7,10 @@ pub mod console;
 pub mod frame_buffer;
 pub mod interrupts;
 pub mod gdt;
+pub mod usb;
 mod paging;
 mod pci;
 mod error;
-mod usb;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
