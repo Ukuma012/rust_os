@@ -7,6 +7,7 @@ pub mod console;
 pub mod frame_buffer;
 pub mod interrupts;
 pub mod gdt;
+mod paging;
 mod pci;
 mod error;
 mod usb;
@@ -50,7 +51,7 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 ];
 
 #[no_mangle]
-pub extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, _memory_map: &MemoryMap) {
+pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
 
     init(frame_buffer);
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
@@ -101,11 +102,12 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, _memo
 
 }
 
-fn init(config: &FrameBufferConfig) {
+unsafe fn init(config: &FrameBufferConfig) {
     graphics_global::init(*config);
     console_global::init();
     gdt::init();
-    interrupts::init_idt();
+    interrupts::init();
+    paging::init();
 }
 
 #[panic_handler]

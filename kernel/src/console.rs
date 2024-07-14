@@ -3,7 +3,7 @@ use core::fmt;
 use crate::graphics::{write_ascii, PixelColor};
 use crate::graphics_global;
 
-const ROWS: usize = 25;
+const ROWS: usize = 125;
 const COLUMNS: usize = 80;
 
 pub struct Console <'a>{
