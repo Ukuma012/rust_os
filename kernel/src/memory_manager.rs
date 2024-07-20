@@ -74,6 +74,10 @@ impl Frame {
     const MIN: Self = Self(1);
     const MAX: Self = Self(FRAME_COUNT);
 
+    pub fn new(v: usize) -> Self {
+        Self(v)
+    }
+
     fn offset(self, offset: usize) -> Self {
         Self(self.0 + offset)
     }

@@ -26,7 +26,9 @@ unsafe impl GlobalAlloc for MemoryAllocator {
         }
     }
 
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
-        panic!("dealloc should be never called")
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        let frame_start = Frame::new(ptr as usize / Frame::SIZE);
+        let num_frames = (layout.size() + layout.align() + Frame::SIZE - 1) / Frame::SIZE;
+        frame_manager().free(frame_start, num_frames)
     }
 }

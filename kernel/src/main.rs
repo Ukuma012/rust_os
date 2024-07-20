@@ -65,7 +65,7 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
 
     println!("{}", "Hello World!");
 
-    alloc_fail_test();
+    alloc_test();
 
     println!("{}", "It didn't crash!");
 
@@ -113,8 +113,9 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
 
 }
 
-fn alloc_fail_test() {
+fn alloc_test() {
     let x = Box::new(42);
+    println!("{}", x);
 }
 
 unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
