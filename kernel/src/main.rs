@@ -20,6 +20,7 @@ use console::console_global;
 use graphics::{graphics_global::{self, pixel_writer}, PixelColor};
 use pci::scan_all_bus;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
+use x86_64::structures::paging::frame;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -53,12 +54,20 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 
 #[no_mangle]
 pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
+    graphics_global::init(*frame_buffer);
+    console_global::init();
+    gdt::init();
+    interrupts::init();
+    paging::init();
 
-    init(frame_buffer);
+    memory_manager::lock_frame_manager().init(memory_map);
+    
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
+
     println!("{}", "Hello World!");
 
     println!("{}", "It didn't crash!");
+
 
     for y in 0..K_MOUSE_CURSOR_HEIGHT {
         for x in 0..K_MOUSE_CURSOR_WIDTH {
@@ -104,11 +113,12 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig
 }
 
 unsafe fn init(config: &FrameBufferConfig) {
-    graphics_global::init(*config);
-    console_global::init();
-    gdt::init();
-    interrupts::init();
-    paging::init();
+    // graphics_global::init(*config);
+    // console_global::init();
+    // gdt::init();
+    // interrupts::init();
+    // paging::init();
+    
 }
 
 #[panic_handler]
