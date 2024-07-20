@@ -52,16 +52,10 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
 ];
 
 #[no_mangle]
-pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig, memory_map: &MemoryMap) {
-    graphics_global::init(*frame_buffer);
-    console_global::init();
-    gdt::init();
-    interrupts::init();
-    paging::init();
-
-    unsafe {memory_manager::frame_manager().init(memory_map)};
+pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig, memory_map: &MemoryMap) {
+    init(frame_buffer_config, memory_map);
     
-    pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
+    pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer_config.width(), frame_buffer_config.height());
 
     println!("{}", "Hello World!");
 
@@ -111,13 +105,13 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig
 
 }
 
-unsafe fn init(config: &FrameBufferConfig) {
-    // graphics_global::init(*config);
-    // console_global::init();
-    // gdt::init();
-    // interrupts::init();
-    // paging::init();
-    
+unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
+    graphics_global::init(*config);
+    console_global::init();
+    gdt::init();
+    interrupts::init();
+    paging::init();
+    memory_manager::frame_manager().init(memory_map); // unsafe
 }
 
 #[panic_handler]
