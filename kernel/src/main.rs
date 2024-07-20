@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 #![feature(abi_x86_interrupt)]
+#![feature(alloc_error_handler)]
+extern crate alloc;
 
 mod graphics;
 mod console;
@@ -12,14 +14,17 @@ mod paging;
 mod pci;
 mod error;
 mod memory_manager;
+mod allocator;
 
 use core::{panic::PanicInfo, arch::asm};
+use alloc::boxed::Box;
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::console_global;
 use graphics::{graphics_global::{self, pixel_writer}, PixelColor};
 use pci::scan_all_bus;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
+use allocator::MemoryAllocator;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -51,6 +56,7 @@ const MOUSE_CURSOR_SHAPE: [[char; K_MOUSE_CURSOR_WIDTH]; K_MOUSE_CURSOR_HEIGHT] 
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '@', '@', '@', ' ', ' ', ' '],
 ];
 
+
 #[no_mangle]
 pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig, memory_map: &MemoryMap) {
     init(frame_buffer_config, memory_map);
@@ -58,6 +64,8 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer_config.width(), frame_buffer_config.height());
 
     println!("{}", "Hello World!");
+
+    alloc_fail_test();
 
     println!("{}", "It didn't crash!");
 
@@ -105,6 +113,10 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
 
 }
 
+fn alloc_fail_test() {
+    let x = Box::new(42);
+}
+
 unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
     graphics_global::init(*config);
     console_global::init();
@@ -120,4 +132,12 @@ fn panic(info: &PanicInfo) -> ! {
     loop {
         unsafe {asm!("hlt")}
     }
+}
+
+#[global_allocator]
+static ALLOCATOR: MemoryAllocator = MemoryAllocator;
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> !{
+    panic!("allocation error: {:?}", layout)
 }

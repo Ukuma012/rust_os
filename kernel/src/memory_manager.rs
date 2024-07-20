@@ -2,6 +2,7 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 use common::memory_map::MemoryMap;
 use log::trace;
+use x86_64::structures::paging::{FrameAllocator, FrameDeallocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
 
 #[derive(Debug)]
@@ -84,6 +85,14 @@ impl Frame {
     fn from_phys_addr(addr: PhysAddr) -> Self {
         Self(addr.as_u64() as usize / Frame::SIZE)
     }
+
+    fn phys_frame(self) -> PhysFrame {
+        PhysFrame::from_start_address(self.phys_addr()).unwrap()
+    }
+
+    pub fn frame_id(self) -> usize {
+        self.0
+    }
 }
 
 pub struct BitmapMemoryManager {
@@ -149,7 +158,7 @@ impl BitmapMemoryManager {
         self.set_memory_range(Frame::MIN, Frame::from_phys_addr(PhysAddr::new(phys_available_end as u64)));
     }
 
-    pub fn alocate(&mut self, num_frames: usize) -> Result<Frame, AllocateError> {
+    pub fn allocate(&mut self, num_frames: usize) -> Result<Frame, AllocateError> {
         let mut frame = self.begin;
         loop {
             for i in 0..num_frames {
@@ -171,6 +180,21 @@ impl BitmapMemoryManager {
             trace!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
             self.set_bit(frame.offset(i), false);
         }
+    }
+}
+
+unsafe impl FrameAllocator<Size4KiB> for BitmapMemoryManager {
+    fn allocate_frame(&mut self) -> Option<x86_64::structures::paging::PhysFrame<Size4KiB>> {
+        match self.allocate(1) {
+            Ok(frame) => Some(frame.phys_frame()),
+            Err(_) => None,
+        }
+    }
+}
+
+impl FrameDeallocator<Size4KiB> for BitmapMemoryManager {
+    unsafe fn deallocate_frame(&mut self, frame: PhysFrame<Size4KiB>) {
+        self.free(Frame::from_phys_addr(frame.start_address()), 1)
     }
 }
 
