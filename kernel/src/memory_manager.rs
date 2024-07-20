@@ -172,7 +172,6 @@ impl BitmapMemoryManager {
             self.set_bit(frame.offset(i), false);
         }
     }
-    
 }
 
 pub enum AllocateError {
