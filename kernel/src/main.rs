@@ -20,7 +20,6 @@ use console::console_global;
 use graphics::{graphics_global::{self, pixel_writer}, PixelColor};
 use pci::scan_all_bus;
 use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
-use x86_64::structures::paging::frame;
 
 const K_MOUSE_CURSOR_WIDTH: usize = 15;
 const K_MOUSE_CURSOR_HEIGHT: usize = 24;
@@ -60,7 +59,7 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer: &FrameBufferConfig
     interrupts::init();
     paging::init();
 
-    memory_manager::lock_frame_manager().init(memory_map);
+    unsafe {memory_manager::frame_manager().init(memory_map)};
     
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer.width(), frame_buffer.height());
 

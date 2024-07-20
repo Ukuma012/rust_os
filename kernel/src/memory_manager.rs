@@ -1,32 +1,56 @@
 use core::mem;
-use lazy_static::lazy_static;
+use core::ops::{Deref, DerefMut};
 use common::memory_map::MemoryMap;
 use log::trace;
 use x86_64::PhysAddr;
-use spin::mutex::Mutex;
 
-// lazy_static! {
-//     static ref FRAME_MANAGER: Mutex<BitmapMemoryManager> = Mutex::new(BitmapMemoryManager::new());
-// }
+#[derive(Debug)]
+pub struct Spin<T: ?Sized> {
+    inner: spin::Mutex<T>,
+}
 
-// pub fn frame_manager() -> spin::MutexGuard<'static, BitmapMemoryManager> {
-//     FRAME_MANAGER.lock()
-// }
+impl<T: ?Sized> Spin<T> {
+    fn get_mut(&mut self) -> &mut T {
+        self.inner.get_mut()
+    }
 
-static mut FRAME_MANAGER: Option<Mutex<BitmapMemoryManager>> = None;
-
-pub fn frame_manager() -> &'static Mutex<BitmapMemoryManager> {
-    unsafe {
-        // 初めてアクセスされたときに初期化を行います。
-        if FRAME_MANAGER.is_none() {
-            FRAME_MANAGER = Some(Mutex::new(BitmapMemoryManager::new()));
-        }
-        FRAME_MANAGER.as_ref().unwrap()
+    pub fn lock(&self) -> SpinGuard<T> {
+        let inner = self.inner.lock();
+        SpinGuard {inner}
     }
 }
 
-pub fn lock_frame_manager() -> spin::MutexGuard<'static, BitmapMemoryManager> {
-    frame_manager().lock()
+impl<T> Spin<T> {
+    const fn new(value: T) -> Self {
+        Self {
+            inner: spin::Mutex::new(value),
+        }
+    }
+}
+
+pub struct SpinGuard<'a, T: 'a + ?Sized> {
+    inner: spin::MutexGuard<'a, T>,
+}
+
+impl<'a, T: 'a + ?Sized> SpinGuard<'a, T> {
+    pub fn leak(this: Self) -> &'a mut T {
+        let inner = spin::MutexGuard::leak(this.inner);
+        inner
+    }
+}
+
+impl<'a, T: 'a + ?Sized> Deref for SpinGuard<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &*self.inner
+    }
+}
+
+impl<'a, T: 'a + ?Sized> DerefMut for SpinGuard<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut *self.inner
+    }
 }
 
 const MAX_PHYSICAL_MEMORY_BYTES: usize = 128 * 1024 * 1024 * 1024; // 128GiB
@@ -34,6 +58,12 @@ const FRAME_COUNT: usize = MAX_PHYSICAL_MEMORY_BYTES / Frame::SIZE; // address0 
 type MapLine = usize;
 const BITS_PER_MAP_LINE: usize = 8 * mem::size_of::<MapLine>();
 const MAP_LINE_COUNT: usize = FRAME_COUNT / BITS_PER_MAP_LINE;
+
+static  FRAME_MANAGER: Spin<BitmapMemoryManager> = Spin::new(BitmapMemoryManager::new());
+
+pub fn frame_manager() -> SpinGuard<'static, BitmapMemoryManager> {
+    FRAME_MANAGER.lock()
+}
 
 #[derive(Copy, Clone, PartialEq, PartialOrd)]
 pub struct Frame(usize);
@@ -63,7 +93,7 @@ pub struct BitmapMemoryManager {
 }
 
 impl BitmapMemoryManager {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             alloc_map: [0; MAP_LINE_COUNT],
             begin: Frame::MIN,
@@ -106,7 +136,7 @@ impl BitmapMemoryManager {
         }
     }
 
-    pub fn init(&mut self, memory_map: &MemoryMap) {
+    pub unsafe fn init(&mut self, memory_map: &MemoryMap) {
         let mut phys_available_end = 0;
         for d in memory_map.descriptors() {
             let phys_start = d.phys_start as usize;
