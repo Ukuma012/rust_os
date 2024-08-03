@@ -21,9 +21,7 @@ use alloc::boxed::Box;
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::console_global;
-use graphics::{graphics_global::{self, pixel_writer}, PixelColor};
-use pci::scan_all_bus;
-use usb::xhci::{mapper::IdentityMapper, xhci::XhciController, xhciregisters::XhciRegisters};
+use graphics::graphics_global::{self, pixel_writer};
 use allocator::MemoryAllocator;
 
 #[no_mangle]
@@ -37,33 +35,6 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
     alloc_test();
 
     println!("{}", "It didn't crash!");
-
-    let _all_buses = scan_all_bus().unwrap();
-    let num_devices = pci::NUM_DEVICE.lock();
-    let devices = pci::DEVICES.lock();
-    let mut xhc_dev: Option<pci::Device> = None;
-    for i in 0..*num_devices {
-           if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
-               xhc_dev = Some(devices[i]);
-
-               // Prioritize Intel Products
-               if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
-                   break;
-               }
-           }
-    }
-
-    if let Some(dev) = xhc_dev {
-       let xhc_bar = pci::read_bar(&dev, 0).unwrap();
-       let xhc_mmio_base = xhc_bar & !(0x0f as u64);
-
-       let registers = XhciRegisters::new(xhc_mmio_base, IdentityMapper);
-
-       let _xhc_controller = XhciController::new(registers);
-       
-    } else {
-       println!("xHCI Device not found");
-    }
 
     loop {
         unsafe {asm!("hlt")}
