@@ -17,7 +17,6 @@ mod memory_manager;
 mod allocator;
 
 use core::{panic::PanicInfo, arch::asm};
-use alloc::boxed::Box;
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use console::console_global;
@@ -32,19 +31,9 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
 
     println!("{}", "Hello World!");
 
-    alloc_test();
-
-    println!("{}", "It didn't crash!");
-
     loop {
         unsafe {asm!("hlt")}
     }
-
-}
-
-fn alloc_test() {
-    let x = Box::new(42);
-    println!("{}", x);
 }
 
 unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
