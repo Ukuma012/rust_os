@@ -103,9 +103,6 @@ impl FrameBufferWriter {
 
     pub fn draw_desktop(&self, width: u32, height: u32) {
         self.fill_rectangle(Vector2D { x: 0, y: 0 }, Vector2D { x: width, y: height }, &PixelColor {r: 0, g: 0, b: 0});
-        self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width, y: 50 }, &PixelColor { r: 1, g: 8, b: 17 });
-        self.fill_rectangle(Vector2D { x: 0, y: height - 50 }, Vector2D { x: width / 5, y: 50 }, &PixelColor { r: 80, g: 80, b: 80 });
-        self.draw_rectangle(Vector2D { x: 10, y: height - 40 }, Vector2D { x: 30, y: 30 }, &PixelColor { r: 160, g: 160, b: 160 });
     }
 
     pub fn write_ascii(&self, x: u32, y: u32, c: char, color: &PixelColor) -> () {
