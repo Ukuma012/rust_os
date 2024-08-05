@@ -1,6 +1,9 @@
 // 4levelではなく、3levelになっている
 
+use core::ptr::NonNull;
+
 use x86_64::{registers::control::{Cr3, Cr3Flags}, structures::paging::{PageSize, PageTable, PhysFrame, Size1GiB, Size2MiB}, PhysAddr};
+use acpi::{AcpiHandler, PhysicalMapping};
 use spin::Lazy;
 
 const EMPTY_PAGE_TABLE: PageTable = PageTable::new();
@@ -40,4 +43,28 @@ unsafe fn phys_frame(page_table: &'static PageTable) -> PhysFrame {
     PhysFrame::from_start_address(
         PhysAddr::new(page_table as *const PageTable as u64)
     ).unwrap()
+}
+
+pub fn as_virt_addr(addr: x86_64::PhysAddr) -> Option<x86_64::VirtAddr> {
+    if addr.as_u64() < x86_64::structures::paging::Size1GiB::SIZE * 64 {
+        Some(x86_64::VirtAddr::new(addr.as_u64()))
+    } else {
+        None
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct KernelAcpiHandler;
+
+impl AcpiHandler for KernelAcpiHandler {
+    unsafe fn map_physical_region<T>(&self, addr: usize, size: usize) -> PhysicalMapping<Self, T> {
+        let ptr = as_virt_addr(x86_64::PhysAddr::new(addr as u64))
+            .unwrap()
+            .as_mut_ptr();
+        PhysicalMapping::new(addr, NonNull::new(ptr).unwrap(), size, size, self.clone())
+    }
+
+    fn unmap_physical_region<T>(_region: &PhysicalMapping<Self, T>) {
+        
+    }
 }

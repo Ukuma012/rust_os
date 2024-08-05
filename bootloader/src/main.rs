@@ -46,7 +46,7 @@ fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
     let elf_entry = load_kernel(handle, bs);
 
     trace!("entry_point_addr = 0x{:x}", elf_entry);
-    let entry_point: extern "sysv64" fn(&frame_buffer::FrameBufferConfig, &memory_map::MemoryMap) = unsafe {
+    let entry_point: extern "sysv64" fn(&frame_buffer::FrameBufferConfig, &memory_map::MemoryMap, u64) = unsafe {
         mem::transmute(elf_entry)
     };
 
@@ -54,12 +54,12 @@ fn efi_main(handle: Handle, mut st: SystemTable<Boot>) -> Status {
     let frame_buffer = get_frame_buffer(st.boot_services());
 
     trace!("get_rsdp");
-    let _rsdp = get_rsdp(&st);
+    let rsdp = get_rsdp(&st);
 
     trace!("exit_boot_serveces");
     let (_st, memory_map) = exit_boot_services(handle, st);
 
-    entry_point(&frame_buffer, &memory_map);
+    entry_point(&frame_buffer, &memory_map, rsdp);
 
     trace!("you cannot see this message");
 

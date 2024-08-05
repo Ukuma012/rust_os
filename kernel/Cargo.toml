@@ -11,3 +11,4 @@ spin = "0.9.8"
 xhci = {workspace = true}
 modular-bitfield = {workspace = true}
 x86_64 = {workspace = true}
+acpi = "4.0.0"
