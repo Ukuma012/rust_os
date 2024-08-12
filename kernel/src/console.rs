@@ -30,20 +30,23 @@ impl<'a> Console<'a> {
     pub fn put_string(&mut self, str: &str) {
         let mut writer_guard = graphics::pixel_writer();
         for char in str.chars() {
-            if char == '\n' {
+            if char == '\n' || self.cursor_column >= COLUMNS - 1 {
                 self.new_line();
-                continue;
-            } else if self.cursor_column < COLUMNS - 1 {
-                if let Some(writer) = writer_guard.as_mut() {
-                    write_ascii(
-                        writer,
-                        8 * self.cursor_column as u32,
-                        16 * self.cursor_row as u32,
-                        char,
-                        &self.fg_color,
-                    )
+                if char == '\n' {
+                    continue;
                 }
             }
+
+            if let Some(writer) = writer_guard.as_mut() {
+                write_ascii(
+                    writer,
+                    8 * self.cursor_column as u32,
+                    16 * self.cursor_row as u32,
+                    char,
+                    &self.fg_color,
+                )
+            }
+
             self.buffer[self.cursor_row][self.cursor_column] = char;
             self.cursor_column += 1;
         }
