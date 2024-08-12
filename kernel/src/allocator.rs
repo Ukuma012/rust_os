@@ -1,12 +1,5 @@
 use alloc::alloc::{GlobalAlloc, Layout};
-use log::error;
 use core::ptr::null_mut;
-use x86_64::{
-    structures::paging::{
-        mapper::MapToError, FrameAllocator, Mapper, Page, PageTableFlags, Size4KiB,
-    },
-    VirtAddr,
-};
 
 use crate::memory_manager::{frame_manager, Frame};
 

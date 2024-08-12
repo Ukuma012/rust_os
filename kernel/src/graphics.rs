@@ -1,5 +1,7 @@
 use core::ops::AddAssign;
 use common::frame_buffer::FrameBufferConfig;
+use spin::mutex::Mutex;
+use lazy_static::lazy_static;
 
 pub struct Vector2D<T> {
     pub x: T,
@@ -150,32 +152,25 @@ pub fn write_ascii<W: PixelWriter>(writer: &mut W, x: u32, y: u32, c: char, colo
     } 
 }
 
-pub mod graphics_global {
-    use common::frame_buffer::FrameBufferConfig;
-    use spin::mutex::Mutex;
-    use lazy_static::lazy_static;
-    use super::FrameBufferWriter;
+lazy_static! {
+    static ref FRAME_BUFFER_CONFIG: Mutex<Option<FrameBufferConfig>> = Mutex::new(None);
+    static ref WRITER: Mutex<Option<FrameBufferWriter>> = Mutex::new(None);
+}
 
-    lazy_static! {
-        static ref FRAME_BUFFER_CONFIG: Mutex<Option<FrameBufferConfig>> = Mutex::new(None);
-        static ref WRITER: Mutex<Option<FrameBufferWriter>> = Mutex::new(None);
-    }
+pub fn init(config: FrameBufferConfig) {
+    let mut fb_config = FRAME_BUFFER_CONFIG.lock();
+    let mut writer = WRITER.lock();
 
-    pub fn init(config: FrameBufferConfig) {
-        let mut fb_config = FRAME_BUFFER_CONFIG.lock();
-        let mut writer = WRITER.lock();
+    *fb_config = Some(config);
+    *writer = Some(FrameBufferWriter::new(config));
+}
 
-        *fb_config = Some(config);
-        *writer = Some(FrameBufferWriter::new(config));
-    }
+pub fn frame_buffer_config() -> spin::MutexGuard<'static, Option<FrameBufferConfig>> {
+    FRAME_BUFFER_CONFIG.lock()
+}
 
-    pub fn frame_buffer_config() -> spin::MutexGuard<'static, Option<FrameBufferConfig>> {
-        FRAME_BUFFER_CONFIG.lock()
-    }
-
-    pub fn pixel_writer() -> spin::MutexGuard<'static, Option<FrameBufferWriter>> {
-        WRITER.lock()
-    }
+pub fn pixel_writer() -> spin::MutexGuard<'static, Option<FrameBufferWriter>> {
+    WRITER.lock()
 }
 
 extern "C" {

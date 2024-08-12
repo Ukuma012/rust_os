@@ -13,18 +13,16 @@ mod paging;
 mod error;
 mod memory_manager;
 mod allocator;
-mod acpi;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
-use console::console_global;
-use graphics::graphics_global::{self, pixel_writer};
+use graphics::pixel_writer;
 use allocator::MemoryAllocator;
 
 #[no_mangle]
-pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig, memory_map: &MemoryMap, rsdp: u64) {
-    init(frame_buffer_config, memory_map, rsdp);
+pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig, memory_map: &MemoryMap) {
+    init(frame_buffer_config, memory_map);
     
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer_config.width(), frame_buffer_config.height());
 
@@ -35,14 +33,13 @@ pub unsafe extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBuffe
     }
 }
 
-unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap, rsdp: u64) {
-    graphics_global::init(*config);
-    console_global::init();
+unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
+    graphics::init(*config);
+    console::init();
     gdt::init();
     interrupts::init();
     paging::init();
     memory_manager::frame_manager().init(memory_map); // unsafe
-    acpi::initialize(paging::KernelAcpiHandler, rsdp as usize);
 }
 
 #[panic_handler]
