@@ -2,6 +2,8 @@
 #![no_main]
 #![feature(abi_x86_interrupt)]
 #![feature(alloc_error_handler)]
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_runner)]
 extern crate alloc;
 
 mod graphics;
@@ -56,4 +58,12 @@ static ALLOCATOR: MemoryAllocator = MemoryAllocator;
 #[alloc_error_handler]
 fn alloc_error_handler(layout: alloc::alloc::Layout) -> !{
     panic!("allocation error: {:?}", layout)
+}
+
+#[cfg(test)]
+pub fn test_runner(tests: &[&dyn Fn()]) {
+    println!("Running {} tests", tests.len());
+    for test in tests {
+        test();
+    }
 }
