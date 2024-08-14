@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 #![feature(vec_into_raw_parts)]
-#![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
 
 extern crate alloc;
 
@@ -201,6 +199,3 @@ fn is_available_after_exit_boot_services(ty: MemoryType) -> bool {
         MemoryType::CONVENTIONAL | MemoryType::BOOT_SERVICES_CODE | MemoryType::BOOT_SERVICES_DATA
     )
 }
-
-#[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {}
