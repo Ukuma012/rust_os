@@ -1,4 +1,4 @@
-use super::{transfer::device_context::DeviceContextArrayPtr, xhc_registers_operations::RegistersOperation};
+use super::xhc_registers_operations::RegistersOperation;
 use super::allocator::memory_allocatable::MemoryAllocatable;
 
 pub trait DeviceContextOperations {
@@ -23,5 +23,23 @@ where
             .operational
             .dcbaap
             .update_volatile(|device_context| device_context.set(device_context_addr));
+    }
+}
+
+#[repr(transparent)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+pub struct DeviceContextArrayPtr(u64);
+
+impl DeviceContextArrayPtr {
+    pub fn new(address: u64) -> Self {
+        Self(address)
+    }
+
+    pub fn set_device_context_at(&mut self, index: usize, device_context_addr: u64) {
+        unsafe {
+            let ptr = (self.0 as *mut u64).add(index);
+
+            ptr.write(device_context_addr);
+        }
     }
 }
