@@ -11,6 +11,7 @@ mod port;
 mod config;
 mod device_context;
 mod transfer;
+mod allocator;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
