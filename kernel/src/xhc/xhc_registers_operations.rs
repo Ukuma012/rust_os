@@ -4,6 +4,7 @@ use super::usb_command::UsbCommandRegisterOperations;
 use super::doorbell::DoorbellRegistersOperations;
 use super::port::PortRegistersOperations;
 use super::config::ConfigRegisterOperations;
+use super::device_context::DeviceContextOperations;
 use core::fmt::Debug;
 
 pub trait XhcRegistersOperations:
@@ -13,7 +14,7 @@ pub trait XhcRegistersOperations:
     + DoorbellRegistersOperations
     + PortRegistersOperations
     + ConfigRegisterOperations
-    // + DeviceContextBaseAddressArrayPointerAccessible
+    + DeviceContextOperations
 {
 }
 

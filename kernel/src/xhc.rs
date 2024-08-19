@@ -9,6 +9,8 @@ mod usb_command;
 mod doorbell;
 mod port;
 mod config;
+mod device_context;
+mod transfer;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
