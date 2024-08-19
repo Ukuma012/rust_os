@@ -3,6 +3,7 @@ use super::interrupter_set_register::InterrupterSetRegisterOperations;
 use super::usb_command::UsbCommandRegisterOperations;
 use super::doorbell::DoorbellRegistersOperations;
 use super::port::PortRegistersOperations;
+use super::config::ConfigRegisterOperations;
 use core::fmt::Debug;
 
 pub trait XhcRegistersOperations:
@@ -11,7 +12,7 @@ pub trait XhcRegistersOperations:
     + UsbCommandRegisterOperations
     + DoorbellRegistersOperations
     + PortRegistersOperations
-    // + ConfigRegisterAccessible
+    + ConfigRegisterOperations
     // + DeviceContextBaseAddressArrayPointerAccessible
 {
 }

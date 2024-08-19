@@ -8,6 +8,7 @@ mod interrupter_set_register;
 mod usb_command;
 mod doorbell;
 mod port;
+mod config;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
