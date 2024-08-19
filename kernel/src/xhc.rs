@@ -5,6 +5,9 @@ mod xhc_registers_operations;
 mod error;
 mod capability_register;
 mod interrupter_set_register;
+mod usb_command;
+mod doorbell;
+mod port;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
