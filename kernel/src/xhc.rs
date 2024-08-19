@@ -10,8 +10,9 @@ mod doorbell;
 mod port;
 mod config;
 mod device_context;
-mod transfer;
 mod allocator;
+mod scratchpad_buffers_array_ptr;
+mod scratchpad_buffer_ptr;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
