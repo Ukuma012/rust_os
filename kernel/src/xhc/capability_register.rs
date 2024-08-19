@@ -1,10 +1,10 @@
-use crate::xhc::xhc_registers_operations::RegistersOperation;
+use crate::xhc::external_reg::ExternalRegisters;
 
-pub trait CapabilityRegistersOperations {
+pub trait CapabilityExternalRegisterss {
     fn read_max_scratchpad_buffers_len(&self) -> usize;
 }
 
-impl<M> CapabilityRegistersOperations for RegistersOperation<M>
+impl<M> CapabilityExternalRegisterss for ExternalRegisters<M>
 where
     M: xhci::accessor::Mapper + Clone,
 {

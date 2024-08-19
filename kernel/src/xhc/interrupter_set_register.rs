@@ -1,4 +1,4 @@
-use super::xhc_registers_operations::RegistersOperation;
+use super::external_reg::ExternalRegisters;
 
 pub trait InterrupterSetRegisterOperations {
     fn clear_interrupt_pending_at(&mut self, index: usize);
@@ -33,7 +33,7 @@ pub trait InterrupterSetRegisterOperations {
     }
 }
 
-impl<M> InterrupterSetRegisterOperations for RegistersOperation<M>
+impl<M> InterrupterSetRegisterOperations for ExternalRegisters<M>
 where 
     M: xhci::accessor::Mapper + Clone,
 {

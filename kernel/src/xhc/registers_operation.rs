@@ -1,42 +1,15 @@
-use super::capability_register::CapabilityRegistersOperations;
-use super::interrupter_set_register::InterrupterSetRegisterOperations;
-use super::usb_command::UsbCommandRegisterOperations;
-use super::doorbell::DoorbellRegistersOperations;
-use super::port::PortRegistersOperations;
-use super::config::ConfigRegisterOperations;
-use super::device_context::DeviceContextOperations;
-use core::fmt::Debug;
+use super::external_reg::ExternalRegisters;
 
-pub trait XhcRegistersOperations:
-    CapabilityRegistersOperations
-    + InterrupterSetRegisterOperations
-    + UsbCommandRegisterOperations
-    + DoorbellRegistersOperations
-    + PortRegistersOperations
-    + ConfigRegisterOperations
-    + DeviceContextOperations
-{
+pub trait RegistersOperation {
+    fn reset(&mut self);
+    fn run(&mut self);
 }
 
-pub struct RegistersOperation<M>(pub xhci::registers::Registers<M>)
-where
-    M: xhci::accessor::Mapper + Clone;
-
-impl<M> RegistersOperation<M>
-where
+impl<M> RegistersOperation for ExternalRegisters<M>
+where 
     M: xhci::accessor::Mapper + Clone,
- {
-    pub fn new(mmio_base: u64, mapper: M) -> Self {
-        let registers = unsafe { xhci::Registers::new(mmio_base.try_into().unwrap(), mapper) };
-
-        Self(registers)
-    }
-
-    pub fn registers_mut(&mut self) -> &mut xhci::registers::Registers<M> {
-        &mut self.0
-    }
-
-    pub fn reset(&mut self) {
+{
+    fn reset(&mut self) {
         let registers = self.registers_mut();
         registers
             .operational
@@ -97,6 +70,3 @@ where
         {}
     }
 }
-
-
-impl<M> XhcRegistersOperations for RegistersOperation<M> where M: xhci::accessor::Mapper + Clone + Debug {}

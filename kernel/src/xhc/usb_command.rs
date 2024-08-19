@@ -1,10 +1,10 @@
-use super::xhc_registers_operations::RegistersOperation;
+use super::external_reg::ExternalRegisters;
 
 pub trait UsbCommandRegisterOperations {
     fn write_command_ring_addr(&mut self, command_ring_addr: u64);
 }
 
-impl<M> UsbCommandRegisterOperations for RegistersOperation<M>
+impl<M> UsbCommandRegisterOperations for ExternalRegisters<M>
 where 
     M: xhci::accessor::Mapper + Clone,
 {

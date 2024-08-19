@@ -1,4 +1,4 @@
-use super::xhc_registers_operations::RegistersOperation;
+use super::external_reg::ExternalRegisters;
 use super::allocator::memory_allocatable::MemoryAllocatable;
 use super::scratchpad_buffers_array_ptr::ScratchpadBuffersArrayPtr;
 
@@ -26,7 +26,7 @@ pub trait DeviceContextOperations {
     }
 }
 
-impl<M> DeviceContextOperations for RegistersOperation<M>
+impl<M> DeviceContextOperations for ExternalRegisters<M>
 where 
     M: xhci::accessor::Mapper + Clone,
 {

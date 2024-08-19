@@ -1,10 +1,10 @@
-use super::xhc_registers_operations::RegistersOperation;
+use super::external_reg::ExternalRegisters;
 
-pub trait DoorbellRegistersOperations {
+pub trait DoorbellExternalRegisterss {
     fn notify_at(&mut self, index: usize, target: u8, stream_id: u16);
 }
 
-impl<M> DoorbellRegistersOperations for RegistersOperation<M>
+impl<M> DoorbellExternalRegisterss for ExternalRegisters<M>
 where
     M: xhci::accessor::Mapper + Clone,
 {

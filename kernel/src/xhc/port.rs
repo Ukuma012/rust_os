@@ -1,8 +1,7 @@
 use alloc::vec::Vec;
+use super::external_reg::ExternalRegisters;
 
-use super::xhc_registers_operations::RegistersOperation;
-
-pub trait PortRegistersOperations {
+pub trait PortExternalRegisterss {
     fn reset_port_at(&mut self, port_id: u8);
     fn read_port_spped_at(&self, port_id: u8);
     fn read_port_reset_change_status(&self, port_id: u8);
@@ -11,7 +10,7 @@ pub trait PortRegistersOperations {
     fn connectiong_ports(&self) -> Vec<u8>;
 }
 
-impl<M> PortRegistersOperations for RegistersOperation<M>
+impl<M> PortExternalRegisterss for ExternalRegisters<M>
 where
     M: xhci::accessor::Mapper + Clone,
 {
