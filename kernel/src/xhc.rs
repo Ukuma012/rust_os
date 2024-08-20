@@ -18,14 +18,16 @@ mod scratchpad_buffers_array_ptr;
 mod scratchpad_buffer_ptr;
 mod xhc_registers;
 mod registers_operation;
+mod device_manager;
+mod transfer;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
     allocator: Rc<RefCell<Memory>>
+    // device_manager: DeviceManager<Register, Memory>,
     // event_ring: EventRing<Register>,
     // command_ring: CommandRing<Register>,
     // waiting_ports: WaitingPorts,
-    // device_manager: DeviceManager<Register, Memory>,
 }
 
 impl<Register, Memory> XhcController<Register, Memory>
