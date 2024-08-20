@@ -10,6 +10,8 @@
 
 extern crate alloc;
 
+pub mod class_driver;
+mod library;
 mod graphics;
 mod console;
 mod frame_buffer;
