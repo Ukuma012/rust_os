@@ -7,7 +7,7 @@ use crate::xhc::device_manager::device_context::DeviceContext;
 use crate::xhc::device_manager::device_context_index::DeviceContextIndex;
 use crate::xhc::device_manager::input_context::InputContext;
 use crate::xhc::device_manager::control_pipe::ControlPipe;
-use crate::xhc::doorbell::DoorbellExternalRegisterss;
+use crate::xhc::doorbell::DoorbellExternalRegisters;
 use crate::xhc::transfer::transfer_ring::TransferRing;
 
 pub struct DeviceSlot<Doorbell, Memory> {
@@ -22,7 +22,7 @@ pub struct DeviceSlot<Doorbell, Memory> {
 
 impl<Doorbell, Memory> DeviceSlot<Doorbell, Memory>
 where 
-    Doorbell: DoorbellExternalRegisterss,
+    Doorbell: DoorbellExternalRegisters,
     Memory: MemoryAllocatable,
 {
     pub fn new(

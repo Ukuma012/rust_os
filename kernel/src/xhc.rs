@@ -9,7 +9,7 @@ mod external_reg;
 mod capability_register;
 mod interrupter_set_register;
 mod usb_command;
-mod doorbell;
+pub mod doorbell;
 mod port;
 mod config;
 mod device_context;
@@ -18,8 +18,8 @@ mod scratchpad_buffers_array_ptr;
 mod scratchpad_buffer_ptr;
 mod xhc_registers;
 mod registers_operation;
-mod device_manager;
-mod transfer;
+pub mod device_manager;
+pub mod transfer;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,

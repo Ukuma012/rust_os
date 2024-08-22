@@ -1,7 +1,7 @@
 use core::cell::RefCell;
 use alloc::rc::Rc;
 use xhci::ring::trb::transfer::{StatusStage, TransferType, Direction};
-use crate::xhc::{device_manager::device_context_index::DeviceContextIndex, doorbell::DoorbellExternalRegisterss, transfer::transfer_ring::TransferRing};
+use crate::xhc::{device_manager::device_context_index::DeviceContextIndex, doorbell::DoorbellExternalRegisters, transfer::transfer_ring::TransferRing};
 use crate::xhc::device_manager::control_pipe::{make_data_stage, make_setup_stage};
 use super::ControlPipeTransfer;
 
@@ -14,7 +14,7 @@ pub struct ControlIn<T> {
 
 impl<T> ControlIn<T>
 where 
-    T: DoorbellExternalRegisterss,
+    T: DoorbellExternalRegisters,
 {
     pub fn new(
         slot_id: u8,
@@ -49,7 +49,7 @@ where
 
 impl<T> ControlPipeTransfer for ControlIn<T>
 where 
-    T: DoorbellExternalRegisterss,
+    T: DoorbellExternalRegisters,
 {
     fn no_data(&mut self, request: super::request::Request) {
         let setup_stage = make_setup_stage(request.setup_stage(), TransferType::No);

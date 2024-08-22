@@ -1,7 +1,7 @@
 use super::capability_register::CapabilityExternalRegisterss;
 use super::interrupter_set_register::InterrupterSetRegisterOperations;
 use super::usb_command::UsbCommandRegisterOperations;
-use super::doorbell::DoorbellExternalRegisterss;
+use super::doorbell::DoorbellExternalRegisters;
 use super::port::PortExternalRegisterss;
 use super::config::ConfigRegisterOperations;
 use super::device_context::DeviceContextOperations;
@@ -12,7 +12,7 @@ pub trait XhcRegisters:
     + CapabilityExternalRegisterss
     + InterrupterSetRegisterOperations
     + UsbCommandRegisterOperations
-    + DoorbellExternalRegisterss
+    + DoorbellExternalRegisters
     + PortExternalRegisterss
     + ConfigRegisterOperations
     + DeviceContextOperations

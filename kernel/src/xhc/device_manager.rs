@@ -1,13 +1,17 @@
 use alloc::rc::Rc;
 use core::cell::RefCell;
-use super::{allocator::memory_allocatable::MemoryAllocatable, device_context::DeviceContextArrayPtr, doorbell::DoorbellExternalRegisterss, port::PortExternalRegisterss};
+use super::{allocator::memory_allocatable::MemoryAllocatable, device_context::DeviceContextArrayPtr, doorbell::DoorbellExternalRegisters, port::PortExternalRegisterss};
+use crate::class_driver::mouse::driver::MouseDriver;
+use super::device_manager::device::device_map::DeviceMap;
 
-mod device;
-mod device_context;
-mod input_context;
-mod endpoint_id;
-mod device_context_index;
-mod control_pipe;
+pub mod device;
+pub mod device_context;
+pub mod input_context;
+pub mod endpoint_id;
+pub mod device_context_index;
+pub mod control_pipe;
+pub mod descriptor;
+pub mod endpoint_config;
 
 pub struct DeviceManager<Doorbell, Memory> {
     devices: DeviceMap<Doorbell, Memory>,
@@ -19,7 +23,7 @@ pub struct DeviceManager<Doorbell, Memory> {
 
 impl<Doorbell, Memory> DeviceManager<Doorbell, Memory>
 where 
-    Doorbell: DoorbellExternalRegisterss + PortExternalRegisterss + 'static,
+    Doorbell: DoorbellExternalRegisters + PortExternalRegisterss + 'static,
     Memory: MemoryAllocatable,
 {
 

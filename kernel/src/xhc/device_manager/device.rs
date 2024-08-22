@@ -3,13 +3,14 @@ use alloc::{boxed::Box, rc::Rc};
 use device_map::DeviceConfig;
 use phase::{InitStatus, Phase, DATA_BUFF_SIZE};
 use xhci::{context::EndpointType, ring::trb::event::TransferEvent};
-use crate::xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot}, doorbell::DoorbellExternalRegisterss, transfer::event::target_event::TargetEvent};
+use crate::xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot}, doorbell::DoorbellExternalRegisters, transfer::event::target_event::TargetEvent};
 use crate::xhc::device_manager::control_pipe::request::Request;
 use crate::xhc::device_manager::control_pipe::request_type::RequestType;
-
+use crate::class_driver::mouse::driver::MouseDriver;
+use crate::xhc::device_manager::device::phase1::Phase1;
 use super::device_context_index::DeviceContextIndex;
 
-mod device_map;
+pub mod device_map;
 mod device_slot;
 mod phase;
 mod phase1;
@@ -26,7 +27,7 @@ pub struct Device<Doorbell, Memory> {
 
 impl<Doorbell, Memory> Device<Doorbell, Memory>
 where
-    Doorbell: DoorbellExternalRegisterss + 'static,
+    Doorbell: DoorbellExternalRegisters + 'static,
     Memory: MemoryAllocatable,
 {
     fn new(

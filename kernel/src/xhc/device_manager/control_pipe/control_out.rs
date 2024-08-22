@@ -7,7 +7,7 @@ use xhci::ring::trb::transfer::{
     TransferType,
 };
 use crate::xhc::device_manager::control_pipe::{make_data_stage, make_setup_stage};
-use crate::xhc::{device_manager::device_context_index::DeviceContextIndex, doorbell::DoorbellExternalRegisterss, transfer::transfer_ring::TransferRing};
+use crate::xhc::{device_manager::device_context_index::DeviceContextIndex, doorbell::DoorbellExternalRegisters, transfer::transfer_ring::TransferRing};
 use super::ControlPipeTransfer;
 
 pub struct ControlOut<T> {
@@ -19,7 +19,7 @@ pub struct ControlOut<T> {
 
 impl<T> ControlOut<T>
 where 
-    T: DoorbellExternalRegisterss,
+    T: DoorbellExternalRegisters,
 {
     pub fn new(
         slot_id: u8,
@@ -56,7 +56,7 @@ where
 
 impl<T> ControlPipeTransfer for ControlOut<T>
 where 
-    T: DoorbellExternalRegisterss,
+    T: DoorbellExternalRegisters,
 {
     fn no_data(&mut self, request: super::request::Request) {
         let setup_stage = make_setup_stage(request.setup_stage(), TransferType::No);

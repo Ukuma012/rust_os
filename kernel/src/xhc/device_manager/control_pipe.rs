@@ -7,7 +7,7 @@ use xhci::ring::trb::transfer::{
     TransferType
 };
 use crate::xhc::device_manager::control_pipe::request::Request;
-use crate::xhc::doorbell::DoorbellExternalRegisterss;
+use crate::xhc::doorbell::DoorbellExternalRegisters;
 use crate::xhc::device_manager::device_context_index::DeviceContextIndex;
 use crate::xhc::transfer::transfer_ring::TransferRing;
 use crate::xhc::device_manager::control_pipe::control_in::ControlIn;
@@ -26,7 +26,7 @@ pub struct ControlPipe<T> {
 
 impl<T> ControlPipe<T>
     where
-        T: DoorbellExternalRegisterss
+        T: DoorbellExternalRegisters
 {
     pub fn new(
         slot_id: u8,

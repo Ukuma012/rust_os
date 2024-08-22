@@ -3,7 +3,7 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use crate::xhc::transfer::event::target_event::TargetEvent;
 
-use crate::xhc::{allocator::memory_allocatable::MemoryAllocatable, doorbell::DoorbellExternalRegisterss};
+use crate::xhc::{allocator::memory_allocatable::MemoryAllocatable, doorbell::DoorbellExternalRegisters};
 
 use super::device_slot::DeviceSlot;
 
@@ -31,7 +31,7 @@ impl InitStatus {
 
 pub trait Phase<Doorbell, Memory>
 where
-    Doorbell: DoorbellExternalRegisterss,
+    Doorbell: DoorbellExternalRegisters,
     Memory: MemoryAllocatable,
 {
     fn on_transfer_event_received (
