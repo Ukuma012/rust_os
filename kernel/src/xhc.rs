@@ -82,7 +82,7 @@ where
         let connect_ports = self
             .registers
             .borrow()
-            .connection_ports();
+            .connecting_ports();
 
         if connect_ports.is_empty() {
             return ();
