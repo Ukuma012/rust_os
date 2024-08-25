@@ -4,6 +4,10 @@ use alloc::rc::Rc;
 use allocator::{memory_allocatable::MemoryAllocatable, pci_memory_allocator::PciMemoryAllocator};
 use external_reg::{IdentityMapper, ExternalRegisters};
 use xhc_registers::XhcRegisters;
+use crate::class_driver::mouse::subscribable::MouseSubscribable;
+use crate::println;
+use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
+use crate::xhc::device_manager::DeviceManager;
 
 mod external_reg;
 mod capability_register;
@@ -23,8 +27,8 @@ pub mod transfer;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
-    allocator: Rc<RefCell<Memory>>
-    // device_manager: DeviceManager<Register, Memory>,
+    allocator: Rc<RefCell<Memory>>,
+    device_manager: DeviceManager<Register, Memory>,
     // event_ring: EventRing<Register>,
     // command_ring: CommandRing<Register>,
     // waiting_ports: WaitingPorts,
@@ -37,7 +41,8 @@ where
 {
     pub fn new(
         registers: Register,
-        mut allocator: Memory
+        mut allocator: Memory,
+        mouse: MouseDriver,
     ) -> Self {
         let mut registers = Rc::new(RefCell::new(registers));
 
@@ -54,7 +59,13 @@ where
                                     .read_max_scratchpad_buffers_len();
 
         // device manager
-        // let device_manager = setup_device_manager();
+        let device_manager: device_manager::DeviceManager<Register, Memory> = setup_device_manager(
+            &mut registers,
+            8,
+            scratchpad_buffers_len,
+            &mut allocator,
+            mouse
+        );
         // command_ring
         // event ring
         
@@ -62,18 +73,40 @@ where
 
         Self {
             registers,
-            allocator: Rc::new(RefCell::new(allocator))
+            allocator: Rc::new(RefCell::new(allocator)),
+            device_manager
+        }
+    }
+
+    pub fn reset_port(&mut self) {
+        let connect_ports = self
+            .registers
+            .borrow()
+            .connection_ports();
+
+        if connect_ports.is_empty() {
+            return ();
+        }
+
+        self.registers.borrow_mut().reset_port_at(connect_ports[0]);
+
+        for port_id in connect_ports.into_iter().skip(1) {
+            todo!()
         }
     }
 }
 
-pub fn start_xhci_host_controller(xhc_mmio_base: u64) {
+pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) -> XhcController<ExternalRegisters<IdentityMapper>, PciMemoryAllocator> {
     let registers = ExternalRegisters::new(xhc_mmio_base, IdentityMapper);
     let allocator = PciMemoryAllocator::new();
 
     let mut xhc_controller = XhcController::new(
         registers,
         allocator,
+        MouseDriver::new(mouse_subscriber)
     );
-    todo!()
+
+    let _ = xhc_controller.reset_port();
+
+    xhc_controller
 }

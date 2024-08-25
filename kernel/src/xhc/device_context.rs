@@ -1,5 +1,15 @@
+use core::cell::RefCell;
+
+use alloc::rc::Rc;
+
+use crate::class_driver::mouse::driver::MouseDriver;
+
+use super::device_manager::device::device_map::DeviceMap;
+use super::device_manager::DeviceManager;
+use super::doorbell::DoorbellExternalRegisters;
 use super::external_reg::ExternalRegisters;
 use super::allocator::memory_allocatable::MemoryAllocatable;
+use super::port::PortExternalRegisterss;
 use super::scratchpad_buffers_array_ptr::ScratchpadBuffersArrayPtr;
 
 pub trait DeviceContextOperations {
@@ -54,4 +64,28 @@ impl DeviceContextArrayPtr {
             ptr.write(device_context_addr);
         }
     }
+}
+
+pub(crate) fn setup_device_manager<T, M> (
+    registers: &mut Rc<RefCell<T>>,
+    device_slots: u8,
+    scratchpad_buffers_len: usize,
+    allocator: &mut impl MemoryAllocatable,
+    mouse: MouseDriver, 
+) -> DeviceManager<T, M>
+where
+    M: MemoryAllocatable,
+    T: DeviceContextOperations
+        + DoorbellExternalRegisters
+        + PortExternalRegisterss
+        + 'static,
+{
+    let device_context_array = registers.borrow_mut().setup_device_context_array(device_slots, scratchpad_buffers_len, allocator);
+
+    DeviceManager::new(
+        DeviceMap::default(),
+        device_context_array,
+        registers,
+        mouse,
+    )
 }

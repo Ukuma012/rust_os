@@ -23,6 +23,7 @@ mod memory_manager;
 mod allocator;
 mod pci;
 mod xhc;
+mod usb;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
@@ -30,6 +31,7 @@ use common::memory_map::MemoryMap;
 use graphics::pixel_writer;
 use allocator::MemoryAllocator;
 use pci::scan_all_bus;
+use usb::mouse::MouseSubscriber;
 use xhc::start_xhci_host_controller;
 
 #[no_mangle]
@@ -60,7 +62,7 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
     if let Some(dev) = xhc_dev {
        let xhc_bar = pci::read_bar(&dev, 0).unwrap();
        let xhc_mmio_base = xhc_bar & !(0x0f as u64);
-       start_xhci_host_controller(xhc_mmio_base);
+       start_xhci_host_controller(xhc_mmio_base, MouseSubscriber::new());
 
     } else {
        println!("xHCI Device not found");

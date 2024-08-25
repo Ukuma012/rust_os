@@ -7,7 +7,7 @@ pub trait PortExternalRegisterss {
     fn read_port_reset_change_status(&self, port_id: u8);
     fn clear_port_reset_change_at(&mut self, port_id: u8);
     fn reset_all(&mut self);
-    fn connectiong_ports(&self) -> Vec<u8>;
+    fn connection_ports(&self) -> Vec<u8>;
 }
 
 impl<M> PortExternalRegisterss for ExternalRegisters<M>
@@ -84,14 +84,13 @@ where
         {}
     }
 
-    fn connectiong_ports(&self) -> Vec<u8> {
+    fn connection_ports(&self) -> Vec<u8> {
         self.0
             .port_register_set
             .into_iter()
             .enumerate()
             .filter(|(_, p)| {
-                p.portsc
-                    .current_connect_status()   
+                p.portsc.current_connect_status() 
             })
             .map(|(id, _)| id as u8)
             .collect()

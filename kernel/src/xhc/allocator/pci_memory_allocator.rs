@@ -10,8 +10,8 @@ pub struct MemoryPool([u8; MEMORY_SIZE]);
 
 #[derive(Debug)]
 pub struct PciMemoryAllocator {
-    address: u64,
-    end_address: u64,
+    pub address: u64,
+    pub end_address: u64,
 }
 
 impl PciMemoryAllocator {

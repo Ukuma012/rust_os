@@ -26,5 +26,18 @@ where
     Doorbell: DoorbellExternalRegisters + PortExternalRegisterss + 'static,
     Memory: MemoryAllocatable,
 {
-
+    pub fn new(
+        devices: DeviceMap<Doorbell, Memory>,
+        device_context_array: DeviceContextArrayPtr,
+        registers: &Rc<RefCell<Doorbell>>,
+        mouse: MouseDriver,
+    ) -> Self {
+        Self {
+            devices,
+            device_context_array,
+            addressing_port_id: None,
+            registers: Rc::clone(registers),
+            mouse,
+        }
+    }
 }
