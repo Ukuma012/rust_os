@@ -1,6 +1,7 @@
 pub mod event;
 pub mod transfer_ring;
-mod trb_raw_data;
+pub mod trb_raw_data;
+pub mod command_ring;
 
 pub(crate) fn trb_buffer_from_address(trb_pointer: &mut u128) -> &mut [u32] {
     let ptr = trb_pointer as *mut u128;

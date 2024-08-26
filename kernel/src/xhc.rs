@@ -3,11 +3,12 @@ use core::fmt::Debug;
 use alloc::rc::Rc;
 use allocator::{memory_allocatable::MemoryAllocatable, pci_memory_allocator::PciMemoryAllocator};
 use external_reg::{IdentityMapper, ExternalRegisters};
+use usb_command::setup_command_ring;
 use xhc_registers::XhcRegisters;
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
-use crate::println;
 use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
 use crate::xhc::device_manager::DeviceManager;
+use crate::xhc::transfer::command_ring::CommandRing;
 
 mod external_reg;
 mod capability_register;
@@ -29,8 +30,8 @@ pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
     allocator: Rc<RefCell<Memory>>,
     device_manager: DeviceManager<Register, Memory>,
+    command_ring: CommandRing<Register>,
     // event_ring: EventRing<Register>,
-    // command_ring: CommandRing<Register>,
     // waiting_ports: WaitingPorts,
 }
 
@@ -67,6 +68,7 @@ where
             mouse
         );
         // command_ring
+        let command_ring = setup_command_ring(&mut registers, 32, &mut allocator);
         // event ring
         
         registers.borrow_mut().run();
@@ -74,7 +76,8 @@ where
         Self {
             registers,
             allocator: Rc::new(RefCell::new(allocator)),
-            device_manager
+            device_manager,
+            command_ring
         }
     }
 
