@@ -9,6 +9,7 @@ use crate::class_driver::mouse::subscribable::MouseSubscribable;
 use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
 use crate::xhc::device_manager::DeviceManager;
 use crate::xhc::transfer::command_ring::CommandRing;
+use crate::xhc::transfer::event::event_ring::EventRing;
 
 mod external_reg;
 mod capability_register;
@@ -31,7 +32,7 @@ pub struct XhcController<Register, Memory> {
     allocator: Rc<RefCell<Memory>>,
     device_manager: DeviceManager<Register, Memory>,
     command_ring: CommandRing<Register>,
-    // event_ring: EventRing<Register>,
+    event_ring: EventRing<Register>,
     // waiting_ports: WaitingPorts,
 }
 
@@ -70,6 +71,8 @@ where
         // command_ring
         let command_ring = setup_command_ring(&mut registers, 32, &mut allocator);
         // event ring
+
+        // let(_, event_ring) = 
         
         registers.borrow_mut().run();
 

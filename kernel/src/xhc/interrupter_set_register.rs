@@ -1,4 +1,8 @@
-use super::external_reg::ExternalRegisters;
+use core::cell::RefCell;
+
+use alloc::rc::Rc;
+
+use super::{allocator::memory_allocatable::MemoryAllocatable, external_reg::ExternalRegisters};
 
 pub trait InterrupterSetRegisterOperations {
     fn clear_interrupt_pending_at(&mut self, index: usize);
@@ -137,6 +141,16 @@ where
                 iman.clear_interrupt_pending();
             });
     }
-
-
 }
+
+// pub(crate) fn setup_event_ring<T>(
+//     registers: &mut Rc<RefCell<T>>,
+//     event_ring_segment_table_size: u16,
+//     event_ring_segment_size: usize,
+//     allocator: &mut impl MemoryAllocatable,
+// ) -> (EventRignSegmentTable, EventRing<T>)
+// where
+//     T: InterrupterSetRegisterOperations,
+// {
+//     todo!()
+// }
