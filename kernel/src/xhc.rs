@@ -3,6 +3,7 @@ use core::fmt::Debug;
 use alloc::rc::Rc;
 use allocator::{memory_allocatable::MemoryAllocatable, pci_memory_allocator::PciMemoryAllocator};
 use external_reg::{IdentityMapper, ExternalRegisters};
+use transfer::event::event_ring::setup_event_ring;
 use usb_command::setup_command_ring;
 use xhc_registers::XhcRegisters;
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
@@ -72,7 +73,7 @@ where
         let command_ring = setup_command_ring(&mut registers, 32, &mut allocator);
         // event ring
 
-        // let(_, event_ring) = 
+        let(_, event_ring) = setup_event_ring(&mut registers, 1, 32, &mut allocator);
         
         registers.borrow_mut().run();
 
@@ -80,7 +81,8 @@ where
             registers,
             allocator: Rc::new(RefCell::new(allocator)),
             device_manager,
-            command_ring
+            command_ring,
+            event_ring,
         }
     }
 

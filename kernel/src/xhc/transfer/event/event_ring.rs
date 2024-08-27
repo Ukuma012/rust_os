@@ -1,10 +1,13 @@
 use alloc::rc::Rc;
 use core::cell::RefCell;
 
+use crate::xhc::allocator::memory_allocatable::MemoryAllocatable;
 use crate::xhc::{interrupter_set_register::InterrupterSetRegisterOperations, transfer::transfer_ring::TransferRing};
 use crate::xhc::transfer::trb_raw_data::TrbRawData;
 use crate::xhc::transfer::event::event_trb::EventTrb;
 use crate::xhc::transfer::trb_byte_size;
+
+use super::event_ring_segment_table::EventRingSegmentTable;
 
 pub struct EventRing<T> {
     transfer_ring: TransferRing,
@@ -76,6 +79,45 @@ where
             .borrow_mut()
             .update_dequeue_pointer_at(0, addr)
     }
+}
 
+pub(crate) fn setup_event_ring<T>(
+    registers: &mut Rc<RefCell<T>>,
+    event_ring_segment_table_size: u16,
+    event_ring_segment_size: usize,
+    allocator: &mut impl MemoryAllocatable,
+) -> (EventRingSegmentTable, EventRing<T>)
+where 
+    T: InterrupterSetRegisterOperations,
+{
+    let event_ring_segment_table_addr =
+        allocator.try_allocate_trb_ring(event_ring_segment_table_size as usize);
 
+    let event_ring_segment_addr = allocator.try_allocate_trb_ring(event_ring_segment_size);
+
+    registers
+        .borrow_mut()
+        .write_event_ring_segment_table_size(0, event_ring_segment_table_size);
+
+    registers
+        .borrow_mut()
+        .write_event_ring_dequeue_pointer_at(0, event_ring_segment_addr);
+
+    let event_ring_table = EventRingSegmentTable::new(
+        event_ring_segment_table_addr,
+        event_ring_segment_addr,
+        event_ring_segment_size,
+    );
+
+    registers
+        .borrow_mut()
+        .write_event_ring_segment_table_pointer_at(0, event_ring_segment_table_addr);
+
+    registers
+        .borrow_mut()
+        .write_interrupter_enable_at(0, true);
+
+    let event_ring = EventRing::new(event_ring_segment_addr, 32, registers);
+
+    (event_ring_table, event_ring)
 }
