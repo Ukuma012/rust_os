@@ -11,6 +11,7 @@ use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup
 use crate::xhc::device_manager::DeviceManager;
 use crate::xhc::transfer::command_ring::CommandRing;
 use crate::xhc::transfer::event::event_ring::EventRing;
+use crate::xhc::waiting_ports::WaitingPorts;
 
 mod external_reg;
 mod capability_register;
@@ -27,6 +28,7 @@ mod xhc_registers;
 mod registers_operation;
 pub mod device_manager;
 pub mod transfer;
+pub mod waiting_ports;
 
 pub struct XhcController<Register, Memory> {
     registers: Rc<RefCell<Register>>,
@@ -34,7 +36,7 @@ pub struct XhcController<Register, Memory> {
     device_manager: DeviceManager<Register, Memory>,
     command_ring: CommandRing<Register>,
     event_ring: EventRing<Register>,
-    // waiting_ports: WaitingPorts,
+    waiting_ports: WaitingPorts,
 }
 
 impl<Register, Memory> XhcController<Register, Memory>
@@ -69,9 +71,8 @@ where
             &mut allocator,
             mouse
         );
-        // command_ring
+
         let command_ring = setup_command_ring(&mut registers, 32, &mut allocator);
-        // event ring
 
         let(_, event_ring) = setup_event_ring(&mut registers, 1, 32, &mut allocator);
         
@@ -83,6 +84,7 @@ where
             device_manager,
             command_ring,
             event_ring,
+            waiting_ports: WaitingPorts::default()
         }
     }
 
@@ -99,7 +101,7 @@ where
         self.registers.borrow_mut().reset_port_at(connect_ports[0]);
 
         for port_id in connect_ports.into_iter().skip(1) {
-            todo!()
+            self.waiting_ports.push(port_id);
         }
     }
 }
