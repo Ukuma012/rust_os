@@ -48,7 +48,7 @@ where
     pub fn new(
         registers: Register,
         mut allocator: Memory,
-        mouse: MouseDriver,
+        // mouse: MouseDriver,
     ) -> Self {
         let mut registers = Rc::new(RefCell::new(registers));
 
@@ -70,7 +70,7 @@ where
             8,
             scratchpad_buffers_len,
             &mut allocator,
-            mouse
+            // mouse
         );
 
         let command_ring = setup_command_ring(&mut registers, 32, &mut allocator);
@@ -114,7 +114,7 @@ pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl Mou
     let mut xhc_controller = XhcController::new(
         registers,
         allocator,
-        MouseDriver::new(mouse_subscriber)
+        // MouseDriver::new(mouse_subscriber)
     );
 
     let _ = xhc_controller.reset_port();

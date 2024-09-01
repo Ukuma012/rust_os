@@ -26,6 +26,7 @@ mod xhc;
 mod usb;
 
 use core::{panic::PanicInfo, arch::asm};
+use alloc::vec::Vec;
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
 use graphics::pixel_writer;

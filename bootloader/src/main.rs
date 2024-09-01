@@ -78,9 +78,6 @@ fn get_memory_map(boot_services: &BootServices) {
     let mut memmap_buf = vec![0; map_size * 16];
     let (_map_key, desc_itr) = boot_services.memory_map(&mut memmap_buf).unwrap();
     let _descriptors = desc_itr.copied().collect::<Vec<_>>();
-    // descriptors.iter().for_each(|descriptor| {
-    //     info!("{:?}, {}, {}, {}", descriptor.ty, descriptor.phys_start, descriptor.virt_start, descriptor.page_count);
-    // })
 }
 
 fn open_directory(_image: Handle, boot_services: &BootServices) -> Directory {

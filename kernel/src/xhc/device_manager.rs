@@ -18,7 +18,7 @@ pub struct DeviceManager<Doorbell, Memory> {
     device_context_array: DeviceContextArrayPtr,
     addressing_port_id: Option<u8>,
     registers: Rc<RefCell<Doorbell>>,
-    mouse: MouseDriver,
+    // mouse: MouseDriver,
 }
 
 impl<Doorbell, Memory> DeviceManager<Doorbell, Memory>
@@ -30,14 +30,14 @@ where
         devices: DeviceMap<Doorbell, Memory>,
         device_context_array: DeviceContextArrayPtr,
         registers: &Rc<RefCell<Doorbell>>,
-        mouse: MouseDriver,
+        // mouse: MouseDriver,
     ) -> Self {
         Self {
             devices,
             device_context_array,
             addressing_port_id: None,
             registers: Rc::clone(registers),
-            mouse,
+            // mouse,
         }
     }
 }

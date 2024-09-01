@@ -1,5 +1,6 @@
 use core::fmt::Debug;
 use core::num::NonZeroUsize;
+
 use super::xhc_registers::XhcRegisters;
 
 #[derive(Debug)]
