@@ -12,4 +12,5 @@ cd .. && qemu-system-x86_64 \
          -device ahci,id=ahci \
          -device ide-cd,drive=disk,bus=ahci.0 \
          -drive id=disk,if=none,format=raw,file=bootloader/build/app.img \
-         -device qemu-xhci
+         -device nec-usb-xhci,id=xhci \
+         -device usb-mouse
