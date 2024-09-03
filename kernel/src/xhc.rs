@@ -7,6 +7,7 @@ use transfer::event::event_ring::setup_event_ring;
 use usb_command::setup_command_ring;
 use xhc_registers::XhcRegisters;
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
+use crate::println;
 use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
 use crate::xhc::device_manager::DeviceManager;
 use crate::xhc::transfer::command_ring::CommandRing;
@@ -106,7 +107,11 @@ where
     }
 }
 
-pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) -> XhcController<ExternalRegisters<IdentityMapper>, PciMemoryAllocator> {
+pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) {
+    let mut xhc_controller = start_xhc_controller(xhc_mmio_base, mouse_subscriber);
+}
+
+fn start_xhc_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) -> XhcController<ExternalRegisters<IdentityMapper>, PciMemoryAllocator> {
     let registers = ExternalRegisters::new(xhc_mmio_base, IdentityMapper);
     let allocator = PciMemoryAllocator::new();
 

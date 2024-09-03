@@ -48,26 +48,21 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
     let mut xhc_dev: Option<pci::Device> = None;
     //　PCIデバイスからxHCを探す
     for i in 0..*num_devices {
-           if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
-               xhc_dev = Some(devices[i]);
+        if devices[i].class_code.is_match_all(0x0c, 0x03, 0x30) {
+            xhc_dev = Some(devices[i]);
 
-               // Prioritize Intel Products
-               if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
-                   break;
-               }
-           }
+            // Prioritize Intel Products
+            if 0x8086 == xhc_dev.as_ref().unwrap().vender_id() {
+                break;
+            }
+        }
     }
 
-    // コントローラのリセット
-    if let Some(dev) = xhc_dev {
-       let xhc_bar = pci::read_bar(&dev, 0).unwrap();
-       let xhc_mmio_base = xhc_bar & !(0x0f as u64);
-       let xhc_controller = start_xhci_host_controller(xhc_mmio_base, MouseSubscriber::new());
-
-    } else {
-       println!("xHCI Device not found");
-    }
-
+    let dev = xhc_dev.unwrap();
+    let xhc_bar = pci::read_bar(&dev, 0).unwrap();
+    let xhc_mmio_base = xhc_bar & !(0x0f as u64);
+    start_xhci_host_controller(xhc_mmio_base, MouseSubscriber::new());
+    
     loop {
         unsafe {asm!("hlt")}
     }
