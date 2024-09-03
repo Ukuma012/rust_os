@@ -71,7 +71,7 @@ pub(crate) fn setup_device_manager<T, M> (
     device_slots: u8,
     scratchpad_buffers_len: usize,
     allocator: &mut impl MemoryAllocatable,
-    // mouse: MouseDriver, 
+    mouse: MouseDriver, 
 ) -> DeviceManager<T, M>
 where
     M: MemoryAllocatable,
@@ -86,6 +86,6 @@ where
         DeviceMap::default(),
         device_context_array,
         registers,
-        // mouse,
+        mouse,
     )
 }
