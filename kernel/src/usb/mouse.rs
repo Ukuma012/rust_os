@@ -18,6 +18,6 @@ impl MouseSubscribable for MouseSubscriber {
             prev_button: Option<crate::class_driver::mouse::MouseButton>,
             button: Option<crate::class_driver::mouse::MouseButton>,
         ) -> () {
-        todo!()
+            ()
     }
 }

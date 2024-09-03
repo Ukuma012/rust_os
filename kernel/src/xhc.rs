@@ -7,7 +7,6 @@ use transfer::event::event_ring::setup_event_ring;
 use usb_command::setup_command_ring;
 use xhc_registers::XhcRegisters;
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
-use crate::println;
 use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
 use crate::xhc::device_manager::DeviceManager;
 use crate::xhc::transfer::command_ring::CommandRing;

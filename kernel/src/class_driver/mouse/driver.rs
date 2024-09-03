@@ -38,7 +38,8 @@ impl ClassDriverOperate for MouseDriver {
                 self.current_pos,
                 prev_button,
                 self.current_button
-            )
+            );
+
     }
 
     fn data_buff_addr(&self) -> u64 {
