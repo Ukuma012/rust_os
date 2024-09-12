@@ -3,7 +3,7 @@ use alloc::{boxed::Box, rc::Rc};
 use device_map::DeviceConfig;
 use phase::{InitStatus, Phase, DATA_BUFF_SIZE};
 use xhci::{context::EndpointType, ring::trb::event::TransferEvent};
-use crate::xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot}, doorbell::DoorbellExternalRegisters, transfer::event::target_event::TargetEvent};
+use crate::{println, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot}, doorbell::DoorbellExternalRegisters, transfer::event::target_event::TargetEvent}};
 use crate::xhc::device_manager::control_pipe::request::Request;
 use crate::xhc::device_manager::control_pipe::request_type::RequestType;
 use crate::class_driver::mouse::driver::MouseDriver;
@@ -154,7 +154,7 @@ where
         default_control_pipe.set_endpoint_type(EndpointType::Control);
         default_control_pipe.set_max_packet_size(max_packet_size(port_speed));
         default_control_pipe.set_max_burst_size(0);
-        default_control_pipe.set_tr_dequeue_pointer(tr_dequeue_addr);
+        default_control_pipe.set_tr_dequeue_pointer(tr_dequeue_addr); //ここでpanicしている
         default_control_pipe.set_dequeue_cycle_state();
         default_control_pipe.set_interval(0);
         default_control_pipe.set_max_primary_streams(0);

@@ -3,7 +3,7 @@ use super::external_reg::ExternalRegisters;
 
 pub trait PortExternalRegisterss {
     fn reset_port_at(&mut self, port_id: u8);
-    fn read_port_spped_at(&self, port_id: u8);
+    fn read_port_spped_at(&self, port_id: u8) -> u8;
     fn read_port_reset_change_status(&self, port_id: u8);
     fn clear_port_reset_change_at(&mut self, port_id: u8);
     fn reset_all(&mut self);
@@ -30,12 +30,12 @@ where
             {}
     }
 
-    fn read_port_spped_at(&self, port_id: u8) {
+    fn read_port_spped_at(&self, port_id: u8) -> u8 {
         self.0 
             .port_register_set
             .read_volatile_at(port_index(port_id))
             .portsc
-            .port_speed();
+            .port_speed()
     }
 
     fn read_port_reset_change_status(&self, port_id: u8) {

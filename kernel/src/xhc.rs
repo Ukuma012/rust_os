@@ -4,8 +4,12 @@ use alloc::rc::Rc;
 use allocator::{memory_allocatable::MemoryAllocatable, pci_memory_allocator::PciMemoryAllocator};
 use external_reg::{IdentityMapper, ExternalRegisters};
 use transfer::event::event_ring::setup_event_ring;
+use transfer::event::event_trb::EventTrb;
+use transfer::event::target_event::TargetEvent;
+use transfer::trb_raw_data::TrbRawData;
 use usb_command::setup_command_ring;
 use xhc_registers::XhcRegisters;
+use xhci::ring::trb::event::{CommandCompletion, TransferEvent};
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
 use crate::println;
 use crate::{class_driver::mouse::driver::MouseDriver, xhc::device_context::setup_device_manager};
@@ -13,6 +17,7 @@ use crate::xhc::device_manager::DeviceManager;
 use crate::xhc::transfer::command_ring::CommandRing;
 use crate::xhc::transfer::event::event_ring::EventRing;
 use crate::xhc::waiting_ports::WaitingPorts;
+use xhci::ring::trb::event::PortStatusChange;
 
 mod external_reg;
 mod capability_register;
@@ -105,10 +110,112 @@ where
             self.waiting_ports.push(port_id);
         }
     }
+
+    fn process_all_events(&mut self) {
+        while self.event_ring.has_front() {
+            self.process_event();
+        }
+    }
+
+    fn process_event(&mut self) {
+        if let Some(event_trb) = self.event_ring.read_event_trb() {
+            return self.on_event(event_trb)
+        }
+    }
+
+    fn on_event(&mut self, event_trb: EventTrb) {
+        println!("{:?}", event_trb);
+        match event_trb {
+            EventTrb::TransferEvent { transfer_event, target_event } => {
+                self.on_transfer_event(transfer_event, target_event);
+            }
+            EventTrb::CommandCompletionEvent(completion) => {
+                self.process_completion_event(completion)
+            }
+            EventTrb::PortStatusChangeEvent(port_status) => {
+                self.on_port_status_change(port_status)
+            }
+            EventTrb::NotSupport { .. } => {}
+        };
+
+        self.event_ring.next_dequeue_pointer()
+    }
+
+    fn on_transfer_event(&mut self, transfer_event: TransferEvent, target_event: TargetEvent) {
+        let slot_id = transfer_event.slot_id();
+
+        let is_init = self.device_manager.process_transfer_event(slot_id, transfer_event, target_event);
+
+        if is_init {
+            self.configure_endpoint(slot_id);
+        }
+    }
+
+    fn configure_endpoint(&mut self, slot_id: u8) {
+        let input_context_addr = self.device_manager.device_slot_at(slot_id).input_context_addr();
+
+        self.command_ring.push_configure_endpoint(input_context_addr, slot_id);
+    }
+
+    fn process_completion_event(&mut self, completion: CommandCompletion) {
+        match TrbRawData::from_addr(completion.command_trb_pointer())
+            .template()
+            .trb_type()
+            {
+                // Enable Slot
+                9 => self.address_device(completion),
+
+                // Address Device
+                11 => self.init_device(completion),
+
+                // Configure Endpoint
+                12 => self.device_manager.configure_endpoint(completion.slot_id()),
+
+                _ => ()
+            }
+    }
+
+    fn address_device(&mut self, completion: CommandCompletion) {
+        let input_context_addr = self.device_manager.address_device(completion.slot_id(), &self.allocator);
+
+        self.command_ring.push_address_command(input_context_addr, completion.slot_id())
+    }
+
+    fn init_device(&mut self, completion: CommandCompletion) {
+        self.reset_waiting_port_if_need();
+
+        self.device_manager.start_initialize_at(completion.slot_id());
+    }
+
+    fn reset_waiting_port_if_need(&mut self) {
+        if let Some(port_id) = self.waiting_ports.pop() {
+            self.registers.borrow_mut().reset_port_at(port_id)
+        }
+    }
+
+    fn on_port_status_change(&mut self, port_status: PortStatusChange) {
+        let port_id = port_status.port_id();
+
+        if self.device_manager.is_addressing_port(port_id) {
+            self.enable_slot(port_id);
+        } else {
+            self.waiting_ports.push(port_id)
+        }
+    }
+
+    fn enable_slot(&mut self, port_id: u8) {
+        self.registers.borrow_mut().clear_port_reset_change_at(port_id);
+
+        self.device_manager.set_addressing_port_id(port_id);
+
+        self.command_ring.push_enable_slot();
+    }
 }
 
 pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) {
     let mut xhc_controller = start_xhc_controller(xhc_mmio_base, mouse_subscriber);
+
+    xhc_controller.process_all_events()
 }
 
 fn start_xhc_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) -> XhcController<ExternalRegisters<IdentityMapper>, PciMemoryAllocator> {
