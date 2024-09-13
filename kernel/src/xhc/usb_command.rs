@@ -2,6 +2,8 @@ use core::cell::RefCell;
 
 use alloc::rc::Rc;
 
+use crate::println;
+
 use super::{allocator::memory_allocatable::MemoryAllocatable, doorbell::DoorbellExternalRegisters, external_reg::ExternalRegisters, transfer::command_ring::CommandRing};
 
 pub trait UsbCommandRegisterOperations {

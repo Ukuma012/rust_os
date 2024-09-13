@@ -148,6 +148,9 @@ where
             .slot
             .default_control_pipe()
             .transfer_ring_base_addr();
+
+        println!("Problem! tr dequeue addr: {}", tr_dequeue_addr); //ここが64 byteでalignされていないといけない
+
         let control = self.slot.input_context_mut();
         let default_control_pipe = control.endpoint_mut_at(DeviceContextIndex::default().value());
 
