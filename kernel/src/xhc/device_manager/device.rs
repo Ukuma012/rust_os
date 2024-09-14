@@ -1,14 +1,22 @@
-use core::cell::RefCell;
+use super::device_context_index::DeviceContextIndex;
+use crate::class_driver::mouse::driver::MouseDriver;
+use crate::xhc::device_manager::control_pipe::request::Request;
+use crate::xhc::device_manager::control_pipe::request_type::RequestType;
+use crate::xhc::device_manager::device::phase1::Phase1;
+use crate::{
+    println,
+    xhc::{
+        allocator::memory_allocatable::MemoryAllocatable,
+        device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot},
+        doorbell::DoorbellExternalRegisters,
+        transfer::event::target_event::TargetEvent,
+    },
+};
 use alloc::{boxed::Box, rc::Rc};
+use core::cell::RefCell;
 use device_map::DeviceConfig;
 use phase::{InitStatus, Phase, DATA_BUFF_SIZE};
 use xhci::{context::EndpointType, ring::trb::event::TransferEvent};
-use crate::{println, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot}, doorbell::DoorbellExternalRegisters, transfer::event::target_event::TargetEvent}};
-use crate::xhc::device_manager::control_pipe::request::Request;
-use crate::xhc::device_manager::control_pipe::request_type::RequestType;
-use crate::class_driver::mouse::driver::MouseDriver;
-use crate::xhc::device_manager::device::phase1::Phase1;
-use super::device_context_index::DeviceContextIndex;
 
 pub mod device_map;
 mod device_slot;
@@ -37,7 +45,12 @@ where
         mouse: MouseDriver,
     ) -> Self {
         let slot = DeviceSlot::new(slot_id, doorbell, allocator);
+
         let phase = Box::new(Phase1::new(mouse));
+        //ここで値が変化している
+        // let tr_dequeue_addr2 = slot.default_control_pipe().transfer_ring_base_addr();
+        // println!("{}", tr_dequeue_addr2);
+
         Self {
             slot_id,
             phase,
@@ -47,15 +60,11 @@ where
     }
 
     pub fn device_context_addr(&self) -> u64 {
-        self.slot
-            .device_context()
-            .device_context_addr()
+        self.slot.device_context().device_context_addr()
     }
 
     pub fn input_context_addr(&self) -> u64 {
-        self.slot
-            .input_context()
-            .input_context_addr()
+        self.slot.input_context().input_context_addr()
     }
 
     pub fn slot_id(&self) -> u8 {
@@ -68,13 +77,13 @@ where
         doorbell: &Rc<RefCell<Doorbell>>,
         mouse: MouseDriver,
     ) -> Self {
+        // この時点ですでに64 byte alignではない
         let mut device = Self::new(config.slot_id(), allocator, doorbell, mouse);
 
-        device.slot
-            .input_context_mut()
-            .set_enable_slot_context();
+        device.slot.input_context_mut().set_enable_slot_context();
 
-        device.slot
+        device
+            .slot
             .input_context_mut()
             .set_enable_endpoint(DeviceContextIndex::default());
 
@@ -91,14 +100,11 @@ where
         let data_buff_addr = buff as u64;
         let len = self.device_descriptor_buf.len() as u32;
 
-        self.slot   
-            .default_control_pipe_mut()
-            .control_in()
-            .with_data(
-                Request::get_descriptor(DEVICE_DESCRIPTOR_TYPE,  0, len as u16),
-                data_buff_addr,
-                len
-            )
+        self.slot.default_control_pipe_mut().control_in().with_data(
+            Request::get_descriptor(DEVICE_DESCRIPTOR_TYPE, 0, len as u16),
+            data_buff_addr,
+            len,
+        )
     }
 
     pub fn on_transfer_event_received(
@@ -106,9 +112,9 @@ where
         transfer_event: TransferEvent,
         target_event: TargetEvent,
     ) -> InitStatus {
-        let (init_status, phase) = self
-            .phase
-            .on_transfer_event_received(&mut self.slot, transfer_event, target_event);
+        let (init_status, phase) =
+            self.phase
+                .on_transfer_event_received(&mut self.slot, transfer_event, target_event);
 
         if let Some(phase) = phase {
             self.phase = phase;
@@ -118,14 +124,8 @@ where
     }
 
     pub fn on_endpoints_configured(&mut self) {
-        for num in self
-            .phase
-            .interface_nums()
-            .unwrap()
-        {
-            let request_type = RequestType::new()
-                .with_ty(1)
-                .with_recipient(1);
+        for num in self.phase.interface_nums().unwrap() {
+            let request_type = RequestType::new().with_ty(1).with_recipient(1);
 
             self.slot
                 .default_control_pipe_mut()
@@ -144,12 +144,10 @@ where
     }
 
     fn init_default_control_pipe(&mut self, port_speed: u8) {
-        let tr_dequeue_addr = self
-            .slot
-            .default_control_pipe()
-            .transfer_ring_base_addr();
+        let tr_dequeue_addr = self.slot.default_control_pipe().transfer_ring_base_addr();
 
         println!("Problem! tr dequeue addr: {}", tr_dequeue_addr); //ここが64 byteでalignされていないといけない
+                                                                   // どこで値が変化するのか
 
         let control = self.slot.input_context_mut();
         let default_control_pipe = control.endpoint_mut_at(DeviceContextIndex::default().value());

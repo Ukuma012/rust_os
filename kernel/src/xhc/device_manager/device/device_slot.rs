@@ -2,6 +2,7 @@ use alloc::rc::Rc;
 use core::cell::RefCell;
 
 use super::DATA_BUFF_SIZE;
+use crate::println;
 use crate::xhc::allocator::memory_allocatable::MemoryAllocatable;
 use crate::xhc::device_manager::device_context::DeviceContext;
 use crate::xhc::device_manager::device_context_index::DeviceContextIndex;
@@ -39,6 +40,8 @@ where
             doorbell,
             transfer_ring,
         );
+
+        println!("In Device Slot new: {}", default_control_pipe.transfer_ring_base_addr());
 
         Self {
             slot_id,

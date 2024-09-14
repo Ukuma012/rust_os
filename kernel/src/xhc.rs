@@ -215,7 +215,9 @@ where
 pub fn start_xhci_host_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) {
     let mut xhc_controller = start_xhc_controller(xhc_mmio_base, mouse_subscriber);
 
-    xhc_controller.process_all_events()
+    loop {
+        xhc_controller.process_all_events()
+    }
 }
 
 fn start_xhc_controller(xhc_mmio_base: u64, mouse_subscriber: impl MouseSubscribable + 'static) -> XhcController<ExternalRegisters<IdentityMapper>, PciMemoryAllocator> {

@@ -1,4 +1,4 @@
-use crate::{class_driver::mouse::driver::MouseDriver, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::{request::Request, ControlPipeTransfer}, device::phase::InitStatus}, doorbell::DoorbellExternalRegisters}};
+use crate::{class_driver::mouse::driver::MouseDriver, println, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::{request::Request, ControlPipeTransfer}, device::phase::InitStatus}, doorbell::DoorbellExternalRegisters}};
 use alloc::boxed::Box;
 use super::phase::Phase;
 use super::phase2::Phase2;

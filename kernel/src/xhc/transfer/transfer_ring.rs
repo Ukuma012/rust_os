@@ -1,4 +1,3 @@
-use crate::println;
 use crate::xhc::allocator::memory_allocatable::MemoryAllocatable;
 use crate::xhc::transfer::{trb_buffer_from_address, trb_byte_size};
 use crate::xhc::transfer::trb_raw_data::TrbRawData;
