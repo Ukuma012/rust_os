@@ -46,10 +46,13 @@ where
     ) -> Self {
         let slot = DeviceSlot::new(slot_id, doorbell, allocator);
 
+        let tr_dequeue_addr = slot.default_control_pipe().transfer_ring_base_addr();
+        println!("1: {}", tr_dequeue_addr);
+
         let phase = Box::new(Phase1::new(mouse));
-        //ここで値が変化している
-        // let tr_dequeue_addr2 = slot.default_control_pipe().transfer_ring_base_addr();
-        // println!("{}", tr_dequeue_addr2);
+
+        let tr_dequeue_addr = slot.default_control_pipe().transfer_ring_base_addr();
+        println!("2: {}", tr_dequeue_addr);
 
         Self {
             slot_id,
