@@ -1,4 +1,4 @@
-use crate::{class_driver::mouse::driver::MouseDriver, println, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::{request::Request, ControlPipeTransfer}, device::phase::InitStatus}, doorbell::DoorbellExternalRegisters}};
+use crate::{class_driver::mouse::driver::MouseDriver, xhc::{allocator::memory_allocatable::MemoryAllocatable, device_manager::{control_pipe::{request::Request, ControlPipeTransfer}, device::phase::InitStatus}, doorbell::DoorbellExternalRegisters}};
 use alloc::boxed::Box;
 use super::phase::Phase;
 use super::phase2::Phase2;
@@ -23,8 +23,8 @@ where
     fn on_transfer_event_received (
             &mut self,
             slot: &mut super::device_slot::DeviceSlot<Doorbell, Memory>,
-            transfer_event: xhci::ring::trb::event::TransferEvent,
-            target_event: crate::xhc::transfer::event::target_event::TargetEvent,
+            _transfer_event: xhci::ring::trb::event::TransferEvent,
+            _target_event: crate::xhc::transfer::event::target_event::TargetEvent,
         ) -> (super::phase::InitStatus, Option<alloc::boxed::Box<dyn Phase<Doorbell, Memory>>>) {
         const CONFIGURATION_TYPE: u16 = 2;
 
