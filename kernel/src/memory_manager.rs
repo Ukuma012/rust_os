@@ -1,9 +1,10 @@
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use common::memory_map::MemoryMap;
-use log::trace;
 use x86_64::structures::paging::{FrameAllocator, FrameDeallocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
+
+use crate::println;
 
 #[derive(Debug)]
 pub struct Spin<T: ?Sized> {
@@ -143,7 +144,7 @@ impl BitmapMemoryManager {
     fn mark_allocated(&mut self, frame: Frame, num_frames: usize, init: bool) {
         for i in 0..num_frames {
             if !init {
-                trace!("phys_memory: allocate {:?}", frame.offset(i).phys_addr());
+                println!("phys_memory: allocate {:?}", frame.offset(i).phys_addr());
             }
             self.set_bit(frame.offset(i), true);
         }
@@ -181,7 +182,7 @@ impl BitmapMemoryManager {
 
     pub fn free(&mut self, frame: Frame, num_frames: usize) {
         for i in 0..num_frames {
-            trace!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
+            println!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
             self.set_bit(frame.offset(i), false);
         }
     }
