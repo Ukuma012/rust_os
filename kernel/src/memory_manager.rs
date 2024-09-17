@@ -4,6 +4,10 @@ use common::memory_map::MemoryMap;
 use x86_64::structures::paging::{FrameAllocator, FrameDeallocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
 
+// @TODO 挙動の確認。Boxが呼ばれたあとに、本来変わるはずがない値が変化している。
+// Memory Allocationがうまくいっていない可能性がある
+// ページとフレームの対応付けはIdentity Mappingのはず
+
 use crate::println;
 
 #[derive(Debug)]
@@ -61,7 +65,7 @@ type MapLine = usize;
 const BITS_PER_MAP_LINE: usize = 8 * mem::size_of::<MapLine>();
 const MAP_LINE_COUNT: usize = FRAME_COUNT / BITS_PER_MAP_LINE;
 
-static  FRAME_MANAGER: Spin<BitmapMemoryManager> = Spin::new(BitmapMemoryManager::new());
+static FRAME_MANAGER: Spin<BitmapMemoryManager> = Spin::new(BitmapMemoryManager::new());
 
 pub fn frame_manager() -> SpinGuard<'static, BitmapMemoryManager> {
     FRAME_MANAGER.lock()
