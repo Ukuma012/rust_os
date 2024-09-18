@@ -71,6 +71,7 @@ pub fn frame_manager() -> SpinGuard<'static, BitmapMemoryManager> {
     FRAME_MANAGER.lock()
 }
 
+// FrameのなかにIdをもっている
 #[derive(Copy, Clone, PartialEq, PartialOrd)]
 pub struct Frame(usize);
 
