@@ -41,6 +41,10 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
     pixel_writer().as_mut().unwrap().draw_desktop(frame_buffer_config.width(), frame_buffer_config.height());
 
     println!("Hello World");
+    unsafe {
+        paging::init();
+        memory_manager::frame_manager().init(memory_map); // unsafe
+    }
 
     let _all_buses = scan_all_bus().unwrap();
     let num_devices = pci::NUM_DEVICE.lock();
@@ -68,13 +72,11 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
     }
 }
 
-unsafe fn init(config: &FrameBufferConfig, memory_map: &MemoryMap) {
+unsafe fn init(config: &FrameBufferConfig, _memory_map: &MemoryMap) {
     graphics::init(*config);
     console::init();
     gdt::init();
     interrupts::init();
-    paging::init();
-    memory_manager::frame_manager().init(memory_map); // unsafe
 }
 
 #[panic_handler]

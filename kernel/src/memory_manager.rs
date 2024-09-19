@@ -72,12 +72,12 @@ pub fn frame_manager() -> SpinGuard<'static, BitmapMemoryManager> {
 }
 
 // FrameのなかにIdをもっている
-#[derive(Copy, Clone, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Frame(usize);
 
 impl Frame {
     pub const SIZE: usize = 4096; // 4KiB
-    const MIN: Self = Self(1);
+    const MIN: Self = Self(0);
     const MAX: Self = Self(FRAME_COUNT);
 
     pub fn new(v: usize) -> Self {
@@ -146,8 +146,8 @@ impl BitmapMemoryManager {
         self.mark_allocated(start, bytes / Frame::SIZE, true)
     }
 
-    fn mark_allocated(&mut self, frame: Frame, num_frames: usize, init: bool) {
-        for i in 0..num_frames {
+    fn mark_allocated(&mut self, frame: Frame, number_of_frames: usize, init: bool) {
+        for i in 0..number_of_frames {
             if !init {
                 println!("phys_memory: allocate {:?}", frame.offset(i).phys_addr());
             }
@@ -160,6 +160,8 @@ impl BitmapMemoryManager {
         for d in memory_map.descriptors() {
             let phys_start = d.phys_start as usize;
             let phys_end = d.phys_end as usize;
+            // Memory領域全体を未使用だと思っているmemory managerに
+            // MemoryMap上で歯抜けになっている部分を使用中であると教える
             if phys_available_end < d.phys_start as usize {
                 self.mark_allocated_in_bytes(Frame::from_phys_addr(PhysAddr::new(phys_available_end as u64)), phys_start - phys_available_end);
             }
@@ -168,10 +170,10 @@ impl BitmapMemoryManager {
         self.set_memory_range(Frame::MIN, Frame::from_phys_addr(PhysAddr::new(phys_available_end as u64)));
     }
 
-    pub fn allocate(&mut self, num_frames: usize) -> Result<Frame, AllocateError> {
+    pub fn allocate(&mut self, number_of_frames: usize) -> Result<Frame, AllocateError> {
         let mut frame = self.begin;
         loop {
-            for i in 0..num_frames {
+            for i in 0..number_of_frames {
                 if frame.offset(i) >= self.end {
                     Err(AllocateError::NotEnoughFrame)?
                 }
@@ -180,13 +182,13 @@ impl BitmapMemoryManager {
                     continue;
                 }
             }
-            self.mark_allocated(frame, num_frames, false);
+            self.mark_allocated(frame, number_of_frames, false);
             return Ok(frame);
         }
     }
 
-    pub fn free(&mut self, frame: Frame, num_frames: usize) {
-        for i in 0..num_frames {
+    pub fn free(&mut self, frame: Frame, number_of_frames: usize) {
+        for i in 0..number_of_frames {
             println!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
             self.set_bit(frame.offset(i), false);
         }
