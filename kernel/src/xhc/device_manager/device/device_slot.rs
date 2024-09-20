@@ -41,8 +41,6 @@ where
             transfer_ring,
         );
 
-        println!("In Device Slot new: {}", default_control_pipe.transfer_ring_base_addr());
-
         Self {
             slot_id,
             data_buff: [0; DATA_BUFF_SIZE],

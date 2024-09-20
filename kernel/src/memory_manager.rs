@@ -4,12 +4,6 @@ use common::memory_map::MemoryMap;
 use x86_64::structures::paging::{FrameAllocator, FrameDeallocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
 
-// @TODO 挙動の確認。Boxが呼ばれたあとに、本来変わるはずがない値が変化している。
-// Memory Allocationがうまくいっていない可能性がある
-// ページとフレームの対応付けはIdentity Mappingのはず
-
-use crate::println;
-
 #[derive(Debug)]
 pub struct Spin<T: ?Sized> {
     inner: spin::Mutex<T>,
@@ -148,9 +142,9 @@ impl BitmapMemoryManager {
 
     fn mark_allocated(&mut self, frame: Frame, number_of_frames: usize, init: bool) {
         for i in 0..number_of_frames {
-            if !init {
-                println!("phys_memory: allocate {:?}", frame.offset(i).phys_addr());
-            }
+            // if !init {
+            //     println!("phys_memory: allocate {:?}", frame.offset(i).phys_addr());
+            // }
             self.set_bit(frame.offset(i), true);
         }
     }
@@ -172,14 +166,14 @@ impl BitmapMemoryManager {
 
     pub fn allocate(&mut self, number_of_frames: usize) -> Result<Frame, AllocateError> {
         let mut frame = self.begin;
-        loop {
+        'outer: loop {
             for i in 0..number_of_frames {
                 if frame.offset(i) >= self.end {
                     Err(AllocateError::NotEnoughFrame)?
                 }
                 if self.get_bit(frame.offset(i)) {
                     frame = frame.offset(i + 1);
-                    continue;
+                    continue 'outer;
                 }
             }
             self.mark_allocated(frame, number_of_frames, false);
@@ -189,7 +183,7 @@ impl BitmapMemoryManager {
 
     pub fn free(&mut self, frame: Frame, number_of_frames: usize) {
         for i in 0..number_of_frames {
-            println!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
+            // println!("phys_memory: deallocate {:?}", frame.offset(i).phys_addr());
             self.set_bit(frame.offset(i), false);
         }
     }

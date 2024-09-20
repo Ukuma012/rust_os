@@ -3,15 +3,13 @@ use crate::class_driver::mouse::driver::MouseDriver;
 use crate::xhc::device_manager::control_pipe::request::Request;
 use crate::xhc::device_manager::control_pipe::request_type::RequestType;
 use crate::xhc::device_manager::device::phase1::Phase1;
-use crate::{
-    println,
+use crate::
     xhc::{
         allocator::memory_allocatable::MemoryAllocatable,
         device_manager::{control_pipe::ControlPipeTransfer, device::device_slot::DeviceSlot},
         doorbell::DoorbellExternalRegisters,
         transfer::event::target_event::TargetEvent,
-    },
-};
+    };
 use alloc::{boxed::Box, rc::Rc};
 use core::cell::RefCell;
 use device_map::DeviceConfig;
@@ -45,14 +43,7 @@ where
         mouse: MouseDriver,
     ) -> Self {
         let slot = DeviceSlot::new(slot_id, doorbell, allocator);
-
-        let tr_dequeue_addr = slot.default_control_pipe().transfer_ring_base_addr();
-        println!("1: {}", tr_dequeue_addr);
-
         let phase = Box::new(Phase1::new(mouse));
-
-        let tr_dequeue_addr = slot.default_control_pipe().transfer_ring_base_addr();
-        println!("2: {}", tr_dequeue_addr);
 
         Self {
             slot_id,
@@ -149,12 +140,8 @@ where
     fn init_default_control_pipe(&mut self, port_speed: u8) {
         let tr_dequeue_addr = self.slot.default_control_pipe().transfer_ring_base_addr();
 
-        println!("Problem! tr dequeue addr: {}", tr_dequeue_addr); //ここが64 byteでalignされていないといけない
-                                                                   // どこで値が変化するのか
-
         let control = self.slot.input_context_mut();
         let default_control_pipe = control.endpoint_mut_at(DeviceContextIndex::default().value());
-
         default_control_pipe.set_endpoint_type(EndpointType::Control);
         default_control_pipe.set_max_packet_size(max_packet_size(port_speed));
         default_control_pipe.set_max_burst_size(0);
