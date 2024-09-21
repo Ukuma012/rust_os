@@ -71,7 +71,6 @@ where
         doorbell: &Rc<RefCell<Doorbell>>,
         mouse: MouseDriver,
     ) -> Self {
-        // この時点ですでに64 byte alignではない
         let mut device = Self::new(config.slot_id(), allocator, doorbell, mouse);
 
         device.slot.input_context_mut().set_enable_slot_context();
@@ -145,7 +144,7 @@ where
         default_control_pipe.set_endpoint_type(EndpointType::Control);
         default_control_pipe.set_max_packet_size(max_packet_size(port_speed));
         default_control_pipe.set_max_burst_size(0);
-        default_control_pipe.set_tr_dequeue_pointer(tr_dequeue_addr); //ここでpanicしている
+        default_control_pipe.set_tr_dequeue_pointer(tr_dequeue_addr);
         default_control_pipe.set_dequeue_cycle_state();
         default_control_pipe.set_interval(0);
         default_control_pipe.set_max_primary_streams(0);
