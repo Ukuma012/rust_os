@@ -24,6 +24,7 @@ mod allocator;
 mod pci;
 mod xhc;
 mod usb;
+mod cursor;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;

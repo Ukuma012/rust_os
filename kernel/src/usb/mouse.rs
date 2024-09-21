@@ -1,4 +1,7 @@
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
+use crate::class_driver::mouse::MouseButton;
+use crate::library::math::vector::Vector2D;
+use crate::println;
 
 #[derive(Clone, Debug)]
 pub struct MouseSubscriber;
@@ -18,6 +21,10 @@ impl MouseSubscribable for MouseSubscriber {
             prev_button: Option<crate::class_driver::mouse::MouseButton>,
             button: Option<crate::class_driver::mouse::MouseButton>,
         ) -> () {
-            ()
+            update_cursor(current_cursor, button);
     }
+}
+
+fn update_cursor(current_cursor: Vector2D<usize>, button: Option<MouseButton>) {
+    unimplemented!()
 }
