@@ -112,6 +112,9 @@ where
     }
 
     fn process_all_events(&mut self) {
+        // マウスやキーボードの動作に伴ってイベントがxHCという形で溜まっていく
+        // それをwhileの中で繰り返し処理していく
+        // イベントの有無を能動的に調べるのでポーリング方式
         while self.event_ring.has_front() {
             self.process_event();
         }
