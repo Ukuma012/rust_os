@@ -29,8 +29,10 @@ mod cursor;
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
 use common::memory_map::MemoryMap;
+use cursor::MouseCursor;
 use graphics::pixel_writer;
 use allocator::MemoryAllocator;
+use library::math::vector::Vector2D;
 use pci::scan_all_bus;
 use usb::mouse::MouseSubscriber;
 use xhc::start_xhci_host_controller;
@@ -46,6 +48,9 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
         paging::init();
         memory_manager::frame_manager().init(memory_map); // unsafe
     }
+
+    let mouse_cursor = MouseCursor::new(Vector2D{x: 100, y: 200});
+    mouse_cursor.draw();
 
     let _all_buses = scan_all_bus().unwrap();
     let num_devices = pci::NUM_DEVICE.lock();

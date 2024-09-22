@@ -129,6 +129,7 @@ where
     fn on_event(&mut self, event_trb: EventTrb) {
         match event_trb {
             EventTrb::TransferEvent { transfer_event, target_event } => {
+                println!("{:?}", transfer_event);
                 self.on_transfer_event(transfer_event, target_event);
             }
             EventTrb::CommandCompletionEvent(completion) => {
