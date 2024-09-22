@@ -5,7 +5,6 @@ use crate::class_driver::mouse::MouseButton;
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
 use crate::library::math::vector::Vector2D;
 use crate::class_driver::ClassDriverOperate;
-
 use super::current_cursor_pos;
 use super::mouse_button_boot_protocol;
 
