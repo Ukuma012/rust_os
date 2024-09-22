@@ -311,3 +311,28 @@ endpoint_id: 14,
 slot_id: 1,
 cycle_bit: true
 }
+
+    1   0.000000         host → 0.1.0        USB 64 GET DESCRIPTOR Request DEVICE
+    2   0.000047        0.1.0 → host         USB 72 GET DESCRIPTOR Response DEVICE
+    3   0.000392         host → 0.1.0        USB 64 GET DESCRIPTOR Request DEVICE
+    4   0.000413        0.1.0 → host         USB 82 GET DESCRIPTOR Response DEVICE
+    5   0.000716         host → 0.1.0        USB 64 GET DESCRIPTOR Request CONFIGURATION
+    6   0.000736        0.1.0 → host         USB 72 GET DESCRIPTOR Response CONFIGURATION[Malformed Packet]
+    7   0.000973         host → 0.1.0        USB 64 GET DESCRIPTOR Request CONFIGURATION
+    8   0.000997        0.1.0 → host         USB 98 GET DESCRIPTOR Response CONFIGURATION
+    9   0.001479         host → 0.1.0        USB 64 GET DESCRIPTOR Request STRING
+   10   0.001500        0.1.0 → host         USB 66 GET DESCRIPTOR Response STRING[Malformed Packet]
+   11   0.001611         host → 0.1.0        USB 64 GET DESCRIPTOR Request STRING
+   12   0.001630        0.1.0 → host         USB 68 GET DESCRIPTOR Response STRING
+   13   0.001914         host → 0.1.0        USB 64 SET CONFIGURATION Request
+   14   0.001935        0.1.0 → host         USB 64 SET CONFIGURATION Response
+   15   1.301802         host → 0.1.0        USB 64 GET DESCRIPTOR Request DEVICE
+   16   1.301846        0.1.0 → host         USB 82 GET DESCRIPTOR Response DEVICE
+   17   1.313086         host → 0.1.0        USB 64 GET DESCRIPTOR Request CONFIGURATION
+   18   1.313128        0.1.0 → host         USB 98 GET DESCRIPTOR Response CONFIGURATION
+   19   1.323406         host → 0.1.0        USB 64 SET CONFIGURATION Request
+   20   1.323511        0.1.0 → host         USB 64 SET CONFIGURATION Response
+   21   1.337216         host → 0.1.0        USBHID 64 SET_PROTOCOL Request
+   22   1.337256        0.1.0 → host         USBHID 64 SET_PROTOCOL Response
+   23   1.345627         host → 0.1.7        USB 64 URB_ISOCHRONOUS in
+   24   1.345670        0.1.7 → host         USB 64 URB_ISOCHRONOUS in
