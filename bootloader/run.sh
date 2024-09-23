@@ -12,8 +12,8 @@ cd .. && qemu-system-x86_64 \
          -device ahci,id=ahci \
          -device ide-cd,drive=disk,bus=ahci.0 \
          -drive id=disk,if=none,format=raw,file=bootloader/build/app.img \
-         -device qemu-xhci \
-         -device usb-mouse,pcap=mouse.pcap \
+         -device nec-usb-xhci,id=xhci \
+         -device usb-mouse \
          --trace usb_xhci_port_* \
-         --trace "usb_xhci_queue_event" \
-         --trace "usb_xhci_fetch_trb"
+         --trace usb_xhci_queue_event \
+         --trace usb_xhci_fetch_trb

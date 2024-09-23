@@ -1,6 +1,7 @@
 use alloc::rc::Rc;
 use core::cell::RefCell;
 
+use crate::println;
 use crate::xhc::allocator::memory_allocatable::MemoryAllocatable;
 use crate::xhc::{interrupter_set_register::InterrupterSetRegisterOperations, transfer::transfer_ring::TransferRing};
 use crate::xhc::transfer::trb_raw_data::TrbRawData;

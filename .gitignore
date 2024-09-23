@@ -12,3 +12,4 @@ bootloader.efi
 mnt/
 app.img
 kernel.elf
+*.pcap
