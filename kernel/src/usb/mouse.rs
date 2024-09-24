@@ -1,5 +1,6 @@
 use crate::class_driver::mouse::subscribable::MouseSubscribable;
 use crate::class_driver::mouse::MouseButton;
+use crate::cursor::shape::draw_cursor;
 use crate::library::math::vector::Vector2D;
 
 #[derive(Clone, Debug)]
@@ -25,5 +26,8 @@ impl MouseSubscribable for MouseSubscriber {
 }
 
 fn update_cursor(current_cursor: Vector2D<usize>, button: Option<MouseButton>) {
-    unimplemented!()
+    let cursor_x = current_cursor.x as u32;
+    let cursor_y = current_cursor.y as u32;
+    let cursor = Vector2D{x: cursor_x, y: cursor_y};
+    draw_cursor(cursor);
 }
