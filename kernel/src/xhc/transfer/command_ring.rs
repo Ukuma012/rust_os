@@ -2,7 +2,6 @@ use core::cell::RefCell;
 use alloc::rc::Rc;
 
 use xhci::ring::trb::command::ConfigureEndpoint;
-use crate::println;
 use crate::xhc::doorbell::DoorbellExternalRegisters;
 use crate::xhc::transfer::transfer_ring::TransferRing;
 
