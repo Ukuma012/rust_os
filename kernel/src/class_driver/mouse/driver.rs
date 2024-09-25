@@ -18,6 +18,7 @@ pub struct MouseDriver {
 
 impl ClassDriverOperate for MouseDriver {
     fn on_data_received(&mut self) {
+        // data_buff が常に0で埋まっているということは、マウスからデータが正しく受信できていない可能性が高い
         if self
             .data_buff
             .iter()
