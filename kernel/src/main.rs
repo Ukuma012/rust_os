@@ -25,6 +25,7 @@ mod pci;
 mod xhc;
 mod usb;
 mod cursor;
+mod configuration_space;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;
@@ -71,6 +72,9 @@ pub extern "sysv64" fn kernel_stack_main(frame_buffer_config: &FrameBufferConfig
     let dev = xhc_dev.unwrap();
     let xhc_bar = pci::read_bar(&dev, 0).unwrap();
     let xhc_mmio_base = xhc_bar & !(0x0f as u64);
+
+    // enable_msi()
+
     start_xhci_host_controller(xhc_mmio_base, MouseSubscriber::new());
     
     loop {
