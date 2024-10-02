@@ -27,6 +27,7 @@ mod usb;
 mod cursor;
 mod configuration_space;
 mod apic;
+mod io;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;

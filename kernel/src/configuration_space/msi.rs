@@ -1,3 +1,5 @@
+use crate::io::io_memory_accessible::IoMemoryAccessible;
+
 #[derive(Debug)]
 pub struct InterruptCapabilityResigerIter<Io>
     where

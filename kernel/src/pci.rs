@@ -95,8 +95,8 @@ fn make_address(bus: u8, device: u8, function: u8, reg_addr: u8) -> u32 {
 }
 
 extern "C" {
-    fn IoOut32(addr: u16, data: u32);
-    fn IoIn32(addr: u16) -> u32;
+    pub fn IoOut32(addr: u16, data: u32);
+    pub fn IoIn32(addr: u16) -> u32;
 }
 
 fn write_address(address: u32) {
