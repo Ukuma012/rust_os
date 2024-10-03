@@ -99,7 +99,7 @@ extern "C" {
     pub fn IoIn32(addr: u16) -> u32;
 }
 
-fn write_address(address: u32) {
+pub fn write_address(address: u32) {
     unsafe { IoOut32(CONFIG_ADDRESS, address) }
 }
 
@@ -107,7 +107,7 @@ fn write_data(value: u32) {
     unsafe { IoOut32(CONFIG_DATA, value) }
 }
 
-fn read_data() -> u32 {
+pub fn read_data() -> u32 {
     unsafe { IoIn32(CONFIG_DATA)}
 }
 
