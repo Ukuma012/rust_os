@@ -17,3 +17,18 @@ pub struct MsiCapabilityRegister<Io>
     configuration_space: ConfigurationSpace,
     io: Io
 }
+
+impl<Io> MsiCapabilityRegister<Io>
+    where 
+        Io: IoMemoryAccessible,
+{
+    pub fn new(
+        msi_cap_addr: u8,
+        configuration_space: ConfigurationSpace,
+        mut io: Io,
+    ) -> MsiCapabilityRegister<Io> {
+        let control = ControlAccessor::new();
+        let message_address = MessageAddressAccessor::new(
+        )
+    }
+}
