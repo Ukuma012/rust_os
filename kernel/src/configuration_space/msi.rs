@@ -3,6 +3,8 @@ use core::fmt::Debug;
 use crate::io::io_memory_accessible::IoMemoryAccessible;
 use crate::configuration_space::device::GeneralHeader;
 
+pub mod msi_capability_register;
+
 #[derive(Debug)]
 pub struct InterruptCapabilityResigerIter<Io>
     where
