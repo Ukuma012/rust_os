@@ -4,6 +4,7 @@ use crate::configuration_space::msi::msi_capability_register::access::message_ad
 use crate::configuration_space::msi::msi_capability_register::access::message_data::MessageDataAccessor;
 
 pub mod access;
+pub mod structs;
 
 #[derive(Clone)]
 pub struct MsiCapabilityRegister<Io>

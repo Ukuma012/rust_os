@@ -1,4 +1,6 @@
 use core::fmt::{Debug, Formatter};
+use crate::pci::read_data;
+use crate::pci::write_address;
 use crate::pci::IoIn32;
 use crate::pci::IoOut32;
 
@@ -27,6 +29,11 @@ pub trait IoMemoryAccessible {
     fn io_in(&self, port: u16) -> u32;
 
     fn io_out(&mut self, port: u16, value: u32);
+
+    fn read_config_data_with_set_addr(&mut self, config_addr_register: ConfigAddrRegister) -> u32 {
+        write_address(config_addr_register.as_data());
+        read_data()
+    }
 }
 
 pub struct ConfigAddrRegister {
