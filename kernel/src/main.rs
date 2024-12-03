@@ -19,6 +19,8 @@ mod gdt;
 mod paging;
 mod memory_manager;
 mod allocator;
+mod pci;
+mod error;
 
 use core::{panic::PanicInfo, arch::asm};
 use common::frame_buffer::FrameBufferConfig;

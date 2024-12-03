@@ -8,4 +8,4 @@ members = [
 [workspace.dependencies]
 xhci = "0.9.1"
 modular-bitfield = "0.11.2"
-x86_64 = {version = "0.15.1", features = ["instructions"]}
+x86_64 = {version = "0.15.2", features = ["instructions"]}
