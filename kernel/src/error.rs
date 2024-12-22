@@ -1,3 +1,2 @@
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum OsError {
-}
+pub enum OsError {}
